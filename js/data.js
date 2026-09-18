@@ -36,6 +36,23 @@ const TOURNAMENT = {
   subtitle: 'Giải billiards 9 bi · thể thức xếp cao',
   fee: 50000,
   feeNote: 'Người thua trả tiền bàn',
+
+  /* Thông tin hiển thị trong màn giới thiệu đầu trang */
+  event: {
+    format: '9 bi xếp cao',
+    time: '23h00 · 25/9/2026',
+    venue: 'Thái Tuấn Billiards',
+    address: '39 Lê Văn Lương'
+  },
+  prizes: [
+    { icon: '🏆', rank: 'Giải nhất', value: '200.000đ', extra: '+ Cúp vô địch' },
+    { icon: '🥈', rank: 'Giải nhì',  value: '100.000đ' }
+  ],
+  intro: {
+    /* true: chỉ chạy lần đầu mở trang trên trình duyệt đó.
+       false: chạy mỗi lần tải trang. Bấm "Giới thiệu" trên thanh tiêu đề để xem lại. */
+    showOnce: true
+  },
   payment: {
     bank: 'Techcombank',
     holder: 'NGUYEN HOANG ANH',

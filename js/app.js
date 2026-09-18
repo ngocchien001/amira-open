@@ -550,6 +550,15 @@
   document.getElementById('feeQr').src = TOURNAMENT.payment.qr;
   document.title = TOURNAMENT.name + ' — Nhánh đấu';
 
+  /* Logo trên thanh tiêu đề */
+  document.getElementById('brandLogo').innerHTML = createLogo('mark');
+
+  /* Xem lại màn giới thiệu */
+  document.getElementById('introReplayBtn').addEventListener('click', function () {
+    Intro.play();
+  });
+
   render();
   window.addEventListener('load', drawConnectors);
+  Intro.autoPlay();
 })();
