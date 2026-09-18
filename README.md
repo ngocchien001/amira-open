@@ -50,9 +50,32 @@ Lần đầu mở trang sẽ chạy một đoạn animation:
 - **Nút lệ phí ở góc màn hình**: có vệt sáng chạy vòng quanh viền và quầng sáng đập
   theo nhịp để người xem nhận ra là bấm được; rê chuột vào thì hiệu ứng gây chú ý tắt đi.
   Bấm vào mở popup mã VietQR để đóng lệ phí tham gia 50.000đ, kèm nút sao chép số tài khoản.
+- **Khoá chỉnh sửa bằng mật khẩu**: trang mở ra ở chế độ chỉ xem, muốn ghi điểm phải
+  nhập mật khẩu một lần (xem mục dưới).
 - **Lưu kết quả** vào `localStorage` của trình duyệt — tải lại trang không mất điểm.
   Nút `Đặt lại giải` ở thanh trên xoá toàn bộ.
 - **Đồng bộ nhiều thiết bị qua Google Sheet** (tuỳ chọn, xem mục dưới).
+
+## Khoá chỉnh sửa
+
+Trang mở ra ở **chế độ chỉ xem**: ai cũng xem được nhánh đấu và kết quả, nhưng bấm
+`+` / `−` / `✓` / `Đặt lại` / `Đặt lại giải` thì hiện hộp thoại hỏi mật khẩu. Nhập
+đúng một lần là mở khoá, và thao tác vừa bấm được chạy tiếp luôn.
+
+- Mật khẩu mặc định: **`amira`**. Đổi ở `TOURNAMENT.access.editPassword` trong `js/data.js`.
+- Không phân biệt hoa thường và tự cắt khoảng trắng thừa — bàn phím điện thoại hay
+  tự viết hoa chữ đầu.
+- **Tải lại trang là phải nhập lại.** Trạng thái mở khoá chỉ nằm trong bộ nhớ của
+  trang, không ghi xuống `localStorage` hay `sessionStorage`.
+- Nút trên thanh tiêu đề cho biết đang ở trạng thái nào: `🔒 Chỉ xem` (bấm để nhập
+  mật khẩu) hoặc `🔓 Đang mở khoá` (bấm để khoá lại ngay, ví dụ khi đưa máy cho người khác).
+- Để `editPassword: ''` thì bỏ hẳn khoá: nút biến mất, ai cũng sửa được như trước.
+
+**Đây không phải cơ chế bảo mật.** Trang là HTML tĩnh, mật khẩu nằm trong `js/data.js`
+được gửi thẳng về trình duyệt nên ai xem mã nguồn cũng đọc được; endpoint Apps Script
+cũng vẫn nhận ghi từ bên ngoài trang. Khoá này để người xem khỏi bấm nhầm vào điểm
+giữa trận, chứ không chặn được người cố tình. Muốn chặn thật thì phải kiểm tra quyền
+ở phía Apps Script (`apps-script/Code.gs`), không làm được ở trình duyệt.
 
 ## Ảnh khi chia sẻ link
 
@@ -115,8 +138,9 @@ hai sheet con: `_state` giữ JSON (dữ liệu chuẩn) và `Kết quả` là b
 
 ### Giới hạn cần biết
 
-- **Ai mở được trang thì ghi được.** URL Apps Script nằm trong mã nguồn trang.
-  Với giải nội bộ thì chấp nhận được; đây không phải cơ chế bảo mật.
+- **Khoá chỉnh sửa chỉ chặn ở giao diện.** URL Apps Script nằm trong mã nguồn trang,
+  ai biết URL vẫn gửi ghi thẳng vào sheet được mà không cần mật khẩu. Với giải nội bộ
+  thì chấp nhận được; đây không phải cơ chế bảo mật.
 - Apps Script có hạn mức thời gian chạy mỗi ngày. Một buổi giải với vài người xem,
   hỏi lại mỗi 10 giây thì thoải mái; đừng đặt `pollSeconds` quá nhỏ hoặc mở trang
   cả ngày trên nhiều máy.
@@ -129,11 +153,12 @@ hai sheet con: `_state` giữ JSON (dữ liệu chuẩn) và `Kết quả` là b
 ## Cấu trúc
 
 ```
-index.html                  khung trang + popup lệ phí
+index.html                  khung trang + popup lệ phí + popup mật khẩu
 styles.css                  toàn bộ giao diện, gồm cả mốc thời gian của animation
 js/logo.js                  logo SVG: createLogo('full' | 'mark' | 'icon')
 js/data.js                  dữ liệu giải: người chơi, hạng, nhánh đấu, thông tin sự kiện, thanh toán
 js/store.js                 lưu trữ: localStorage + đồng bộ tuỳ chọn qua Google Sheet
+js/access.js                khoá chỉnh sửa: hỏi mật khẩu trước khi cho ghi điểm
 apps-script/Code.gs         code dán vào Apps Script của sheet
 js/intro.js                 màn giới thiệu: dựng nội dung, nút bỏ qua / tạm dừng
 js/app.js                   logic tính điểm, chấp ván, đi tiếp vòng trong, vẽ đường nối
@@ -181,6 +206,8 @@ Chỉ cần sửa `js/data.js`:
   `true` thì chỉ chạy lần đầu trên mỗi trình duyệt.
 - `TOURNAMENT.sync.endpoint` — URL Apps Script để đồng bộ nhiều máy. Để rỗng thì
   trang chạy hoàn toàn cục bộ.
+- `TOURNAMENT.access.editPassword` — mật khẩu để được chỉnh sửa (mặc định `amira`).
+  Để rỗng thì bỏ khoá, ai mở trang cũng ghi điểm được.
 
 Muốn ép thể thức riêng cho một trận, thêm `format` vào trận đó:
 

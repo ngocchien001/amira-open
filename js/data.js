@@ -54,6 +54,15 @@ const TOURNAMENT = {
        Dù đặt thế nào vẫn xem lại được bằng nút "Giới thiệu" trên thanh tiêu đề. */
     showOnce: false
   },
+  /* Khoá chỉnh sửa. Trang mở ra ở chế độ chỉ xem; muốn ghi điểm phải nhập
+     mật khẩu này một lần. Mở khoá chỉ có hiệu lực tới khi rời trang — tải lại
+     là phải nhập lại. Để rỗng ('') thì bỏ khoá, ai cũng sửa được như trước.
+     Lưu ý: trang tĩnh nên mật khẩu này lộ trong mã nguồn gửi về trình duyệt;
+     nó chỉ để người xem khỏi bấm nhầm, không phải lớp bảo mật. */
+  access: {
+    editPassword: 'amira'
+  },
+
   /* Đồng bộ kết quả qua Google Sheet.
      Để endpoint rỗng thì trang chạy hoàn toàn cục bộ như cũ (mỗi máy một bảng riêng).
      Điền URL ứng dụng web của Apps Script (xem apps-script/Code.gs) để mọi thiết bị
