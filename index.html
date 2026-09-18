@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AMIRA OPEN — Nhánh đấu</title>
+<meta name="description" content="Bảng nhánh đấu giải billiards 9 bi AMIRA Open — tứ kết, bán kết, chung kết.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23F97316'/><circle cx='16' cy='16' r='7' fill='%23fff'/><text x='16' y='21' font-size='11' font-family='sans-serif' font-weight='700' fill='%23F97316' text-anchor='middle'>9</text></svg>">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="ball">9</span>
+    <div class="brand-text">
+      <h1 id="tourName">AMIRA OPEN</h1>
+      <p id="tourSubtitle">Giải billiards 9 bi · thể thức xếp cao</p>
+    </div>
+  </div>
+
+  <div class="topbar-actions">
+    <p class="hint">Bấm <b>+ / −</b> để ghi ván · bấm <b>✓</b> để chọn người thắng</p>
+    <button type="button" class="btn btn-ghost" id="resetAllBtn">Đặt lại giải</button>
+  </div>
+</header>
+
+<main>
+  <div class="bracket-scroll">
+    <div class="bracket" id="bracket">
+      <svg class="connectors" id="connectors" aria-hidden="true"></svg>
+      <!-- các vòng đấu được render bằng JS -->
+    </div>
+  </div>
+</main>
+
+<!-- Nút lệ phí ở góc màn hình -->
+<button type="button" class="fee-fab" id="feeBtn" aria-haspopup="dialog">
+  <span class="fee-fab-icon" aria-hidden="true">₫</span>
+  <span class="fee-fab-text">Lệ phí <b id="feeFabAmount">50.000đ</b></span>
+</button>
+
+<!-- Popup QR đóng lệ phí -->
+<div class="modal" id="feeModal" role="dialog" aria-modal="true" aria-labelledby="feeModalTitle" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-card" role="document">
+    <button type="button" class="modal-close" id="feeCloseBtn" aria-label="Đóng" data-close>✕</button>
+
+    <p class="modal-eyebrow">Quét mã để chuyển tiền đến</p>
+    <h2 class="modal-holder" id="feeModalTitle">NGUYEN HOANG ANH</h2>
+    <p class="modal-account">
+      <span id="feeAccount">9468 2547 0111 23</span>
+      <button type="button" class="copy-btn" id="copyAccountBtn" title="Sao chép số tài khoản">Sao chép</button>
+    </p>
+
+    <div class="qr-wrap">
+      <img id="feeQr" src="assets/qr-techcombank.png" alt="Mã VietQR Techcombank của NGUYEN HOANG ANH" width="294" height="336">
+    </div>
+
+    <p class="modal-amount">VND <b id="feeAmount">50.000</b></p>
+    <p class="modal-content-line" id="feeContent">AMIRA Open</p>
+
+    <p class="modal-note">
+      Lệ phí tham gia <b id="feeNoteAmount">50.000đ</b> / người.
+      <span id="feeNote">Người thua trả tiền bàn.</span>
+    </p>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
