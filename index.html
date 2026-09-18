@@ -10,15 +10,14 @@
 <link rel="stylesheet" href="styles.css">
 <script>
   /* Chạy trước khi thân trang hiện ra để không bị "nháy" trang chính
-     một nhịp rồi mới tới màn giới thiệu. */
+     một nhịp rồi mới tới màn giới thiệu. Việc có chạy màn giới thiệu hay không
+     do js/data.js quyết định (TOURNAMENT.intro), js/intro.js sẽ gỡ lớp này ngay
+     nếu lần này không chạy. */
   (function () {
     try {
-      var seen = localStorage.getItem('amira-open:intro-seen') === '1';
-      var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (!seen && !reduce) document.documentElement.classList.add('intro-pending');
-    } catch (e) {
-      document.documentElement.classList.add('intro-pending');
-    }
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    } catch (e) { /* trình duyệt cũ: cứ hiện màn giới thiệu */ }
+    document.documentElement.classList.add('intro-pending');
   })();
 </script>
 </head>

@@ -49,9 +49,10 @@ const TOURNAMENT = {
     { icon: '🥈', rank: 'Giải nhì',  value: '100.000đ' }
   ],
   intro: {
-    /* true: chỉ chạy lần đầu mở trang trên trình duyệt đó.
-       false: chạy mỗi lần tải trang. Bấm "Giới thiệu" trên thanh tiêu đề để xem lại. */
-    showOnce: true
+    /* false: chạy mỗi lần tải trang (hợp khi chiếu trang này lên màn hình ở quán).
+       true : chỉ chạy lần đầu trên mỗi trình duyệt.
+       Dù đặt thế nào vẫn xem lại được bằng nút "Giới thiệu" trên thanh tiêu đề. */
+    showOnce: false
   },
   payment: {
     bank: 'Techcombank',

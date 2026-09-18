@@ -27,7 +27,8 @@ Lần đầu mở trang sẽ chạy một đoạn animation:
 - **Bỏ qua** (góc dưới bên phải, hoặc phím `Esc`) — tắt animation vào thẳng trang chính.
 - **Tạm dừng / Tiếp tục** (hoặc phím `Space`) — dừng đúng khung hình đang chạy,
   kể cả thanh tiến trình.
-- Mặc định chỉ chạy **một lần** trên mỗi trình duyệt (`TOURNAMENT.intro.showOnce`).
+- Mặc định chạy **mỗi lần tải trang**. Đặt `TOURNAMENT.intro.showOnce = true`
+  trong `js/data.js` nếu chỉ muốn chạy lần đầu trên mỗi trình duyệt.
   Bấm **Giới thiệu** trên thanh tiêu đề để xem lại bất cứ lúc nào.
 - Máy đang bật chế độ "giảm chuyển động" của hệ điều hành sẽ vào thẳng trang chính.
 
@@ -79,7 +80,8 @@ Chỉ cần sửa `js/data.js`:
 - `TOURNAMENT.payment` — thông tin nhận lệ phí và đường dẫn ảnh QR.
 - `TOURNAMENT.event` — thể thức, thời gian, địa điểm hiển thị trong màn giới thiệu.
 - `TOURNAMENT.prizes` — danh sách giải thưởng (thêm bớt bao nhiêu dòng cũng được).
-- `TOURNAMENT.intro.showOnce` — `false` nếu muốn animation chạy lại mỗi lần tải trang.
+- `TOURNAMENT.intro.showOnce` — `false` (mặc định) chạy animation mỗi lần tải trang,
+  `true` thì chỉ chạy lần đầu trên mỗi trình duyệt.
 
 Muốn ép thể thức riêng cho một trận, thêm `format` vào trận đó:
 
