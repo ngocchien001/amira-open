@@ -31,6 +31,9 @@ Lần đầu mở trang sẽ chạy một đoạn animation:
   trong `js/data.js` nếu chỉ muốn chạy lần đầu trên mỗi trình duyệt.
   Bấm **Giới thiệu** trên thanh tiêu đề để xem lại bất cứ lúc nào.
 - Máy đang bật chế độ "giảm chuyển động" của hệ điều hành sẽ vào thẳng trang chính.
+- Ảnh nền là `assets/intro-bg.jpg`, được làm nhòe nhẹ và phủ tối để chữ nổi lên.
+  Đổi ảnh thì thay file đó; muốn ảnh nét nguyên bản thì đặt `--bg-blur: 0px`
+  trong khối `.intro` của `styles.css`.
 
 ### Nhánh đấu
 
@@ -59,6 +62,7 @@ js/logo.js                  logo SVG (bản đầy đủ có vòng chữ, bản 
 js/data.js                  dữ liệu giải: người chơi, hạng, nhánh đấu, thông tin sự kiện, thanh toán
 js/intro.js                 màn giới thiệu: dựng nội dung, nút bỏ qua / tạm dừng
 js/app.js                   logic tính điểm, chấp ván, đi tiếp vòng trong, vẽ đường nối
+assets/intro-bg.jpg         ảnh nền của màn giới thiệu
 assets/logo.svg             logo đầy đủ (dùng cho poster, mạng xã hội)
 assets/logo-mark.svg        logo rút gọn, dùng làm favicon
 assets/qr-techcombank.png   mã VietQR nhận lệ phí
