@@ -1042,3 +1042,112 @@ main { padding: 4px 0 120px; }
 @media (max-width: 900px) {
   .sync-chip { font-size: 12px; padding: 6px 12px; }
 }
+
+/* ---------- Khoá chỉnh sửa ---------- */
+
+.btn-lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.btn-lock[hidden] { display: none; }
+.btn-lock::before { content: "🔒"; font-size: 13px; line-height: 1; }
+.btn-lock.is-unlocked {
+  color: #157a3c;
+  border-color: #b9e6c8;
+  background: var(--win-soft);
+}
+.btn-lock.is-unlocked::before { content: "🔓"; }
+.btn-lock.is-unlocked:hover { color: #0f6330; border-color: #8fd7a8; background: #dff6e7; }
+
+/* Ở chế độ chỉ xem, các nút ghi điểm vẫn bấm được — bấm vào thì hiện hộp thoại
+   nhập mật khẩu — nên chỉ đổi con trỏ để báo là có một bước nữa. */
+body.is-locked .step-btn:not(:disabled),
+body.is-locked .win-btn:not(:disabled),
+body.is-locked .link-btn { cursor: pointer; }
+
+.modal-card-pass { padding-bottom: 24px; }
+.modal-card-pass.is-wrong { animation: shake .3s ease-in-out; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-7px); }
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(2px); }
+}
+
+.pass-icon {
+  width: 52px; height: 52px;
+  margin: 2px auto 14px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.pass-sub { margin: 6px 0 0; font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+
+.pass-form {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pass-input {
+  font: inherit;
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  text-align: center;
+  letter-spacing: .08em;
+}
+.pass-input::placeholder { letter-spacing: normal; color: var(--ink-3); }
+.pass-input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent-line);
+}
+
+.btn-primary {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, #f98a2b, #e2590a);
+  color: #fff;
+  font-weight: 700;
+  padding: 11px 16px;
+  border-radius: 12px;
+}
+.btn-primary:hover {
+  color: #fff;
+  border-color: var(--accent-ink);
+  background: linear-gradient(135deg, #f97f18, #cf4f06);
+}
+
+.pass-error {
+  margin: 12px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #c0392b;
+}
+.pass-error[hidden] { display: none; }
+
+.pass-note {
+  margin: 16px 0 0;
+  padding-top: 12px;
+  border-top: 1px dashed var(--accent-line);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .btn-lock { font-size: 13px; padding: 8px 13px; }
+}

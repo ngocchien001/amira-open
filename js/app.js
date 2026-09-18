@@ -534,7 +534,10 @@
 
     if (action === 'reset') {
       var card = btn.closest('.match');
-      if (card) resetMatch(card.dataset.match);
+      if (!card) return;
+      var id = card.dataset.match;
+      /* Chưa mở khoá thì Access hỏi mật khẩu trước, nhập đúng mới chạy tiếp */
+      Access.require(function () { resetMatch(id); });
       return;
     }
 
@@ -543,13 +546,17 @@
     var matchId = slot.dataset.match;
     var side = slot.dataset.side;
 
-    if (action === 'inc') addGame(matchId, side, 1);
-    else if (action === 'dec') addGame(matchId, side, -1);
-    else if (action === 'win') pickWinner(matchId, side);
+    Access.require(function () {
+      if (action === 'inc') addGame(matchId, side, 1);
+      else if (action === 'dec') addGame(matchId, side, -1);
+      else if (action === 'win') pickWinner(matchId, side);
+    });
   });
 
   document.getElementById('resetAllBtn').addEventListener('click', function () {
-    if (confirm('Xoá toàn bộ kết quả và bắt đầu lại giải?')) resetAll();
+    Access.require(function () {
+      if (confirm('Xoá toàn bộ kết quả và bắt đầu lại giải?')) resetAll();
+    });
   });
 
   var redrawTimer;
@@ -635,6 +642,37 @@
   document.getElementById('introReplayBtn').addEventListener('click', function () {
     Intro.play();
   });
+
+  /* ---------- Khoá chỉnh sửa ---------- */
+
+  var lockBtn = document.getElementById('lockBtn');
+  var hintEl = document.getElementById('hint');
+  var HINT_EDIT = 'Bấm <b>+ / −</b> để ghi ván · bấm <b>✓</b> để chọn người thắng';
+  var HINT_VIEW = 'Chế độ chỉ xem · bấm <b>Chỉ xem</b> để nhập mật khẩu';
+
+  function renderLock(unlocked) {
+    document.body.classList.toggle('is-locked', !unlocked);
+    hintEl.innerHTML = unlocked ? HINT_EDIT : HINT_VIEW;
+    /* Không đặt mật khẩu (access.editPassword rỗng) thì giấu luôn nút cho gọn */
+    lockBtn.hidden = !Access.required();
+    lockBtn.className = 'btn btn-lock' + (unlocked ? ' is-unlocked' : '');
+    lockBtn.textContent = unlocked ? 'Đang mở khoá' : 'Chỉ xem';
+    lockBtn.title = unlocked
+      ? 'Bấm để khoá lại, trang về chế độ chỉ xem'
+      : 'Bấm để nhập mật khẩu và chỉnh sửa kết quả';
+  }
+
+  lockBtn.addEventListener('click', function () {
+    if (Access.isUnlocked()) {
+      Access.lock();
+      toast('Đã khoá — trang về chế độ chỉ xem');
+    } else {
+      Access.ask();
+    }
+  });
+
+  Access.init(TOURNAMENT);
+  Access.onChange(renderLock);
 
   /* ---------- Trạng thái đồng bộ ---------- */
 
