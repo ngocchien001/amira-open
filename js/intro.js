@@ -52,7 +52,8 @@ var Intro = (function () {
   function build() {
     var html =
       '<div class="intro-stage">' +
-        '<div class="intro-logo-wrap"><div class="intro-logo">' + createLogo('full') + '</div></div>' +
+        /* dùng bản huy hiệu, không kèm chữ: dòng AMIRA OPEN đã có ngay bên dưới */
+        '<div class="intro-logo-wrap"><div class="intro-logo">' + createLogo('mark') + '</div></div>' +
         '<div class="intro-info">' +
           '<h2 class="intro-title">' + TOURNAMENT.name + '</h2>' +
           '<p class="intro-tagline">Giải billiards ' + (TOURNAMENT.event && TOURNAMENT.event.format || '') + '</p>' +

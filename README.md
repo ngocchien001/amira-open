@@ -117,15 +117,16 @@ hai sheet con: `_state` giữ JSON (dữ liệu chuẩn) và `Kết quả` là b
 ```
 index.html                  khung trang + popup lệ phí
 styles.css                  toàn bộ giao diện, gồm cả mốc thời gian của animation
-js/logo.js                  logo SVG (bản đầy đủ có vòng chữ, bản rút gọn cho thanh tiêu đề)
+js/logo.js                  logo SVG: createLogo('full' | 'mark' | 'icon')
 js/data.js                  dữ liệu giải: người chơi, hạng, nhánh đấu, thông tin sự kiện, thanh toán
 js/store.js                 lưu trữ: localStorage + đồng bộ tuỳ chọn qua Google Sheet
 apps-script/Code.gs         code dán vào Apps Script của sheet
 js/intro.js                 màn giới thiệu: dựng nội dung, nút bỏ qua / tạm dừng
 js/app.js                   logic tính điểm, chấp ván, đi tiếp vòng trong, vẽ đường nối
 assets/intro-bg.jpg         ảnh nền của màn giới thiệu
-assets/logo.svg             logo đầy đủ (dùng cho poster, mạng xã hội)
-assets/logo-mark.svg        logo rút gọn, dùng làm favicon
+assets/logo.svg             logo đầy đủ: huy hiệu kèm chữ AMIRA / OPEN (poster, mạng xã hội)
+assets/logo-mark.svg        chỉ huy hiệu, dùng trên thanh tiêu đề và màn giới thiệu
+assets/favicon.svg          chỉ quả bi số 9, dùng làm favicon (cỡ 16px huy hiệu không đọc nổi)
 assets/qr-techcombank.png   mã VietQR nhận lệ phí
 ```
 
