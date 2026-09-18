@@ -622,7 +622,6 @@
 
   document.getElementById('tourName').textContent = TOURNAMENT.name;
   document.getElementById('tourSubtitle').textContent = TOURNAMENT.subtitle;
-  document.getElementById('feeFabAmount').textContent = money(TOURNAMENT.fee) + 'đ';
   document.getElementById('feeAmount').textContent = money(TOURNAMENT.fee);
   document.getElementById('feeNoteAmount').textContent = money(TOURNAMENT.fee) + 'đ';
   document.getElementById('feeNote').textContent = TOURNAMENT.feeNote + '.';
