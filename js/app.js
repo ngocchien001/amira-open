@@ -605,8 +605,9 @@
   document.getElementById('feeQr').src = TOURNAMENT.payment.qr;
   document.title = TOURNAMENT.name + ' — Nhánh đấu';
 
-  /* Logo trên thanh tiêu đề */
-  document.getElementById('brandLogo').innerHTML = createLogo('mark');
+  /* Logo trên thanh tiêu đề: dùng bản quả bi cho tương phản cao ở cỡ nhỏ,
+     huy hiệu trắng viền vàng bị chìm trên nền kem. */
+  document.getElementById('brandLogo').innerHTML = createLogo('icon');
 
   /* Xem lại màn giới thiệu */
   document.getElementById('introReplayBtn').addEventListener('click', function () {

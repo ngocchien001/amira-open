@@ -125,8 +125,9 @@ js/intro.js                 màn giới thiệu: dựng nội dung, nút bỏ qu
 js/app.js                   logic tính điểm, chấp ván, đi tiếp vòng trong, vẽ đường nối
 assets/intro-bg.jpg         ảnh nền của màn giới thiệu
 assets/logo.svg             logo đầy đủ: huy hiệu kèm chữ AMIRA / OPEN (poster, mạng xã hội)
-assets/logo-mark.svg        chỉ huy hiệu, dùng trên thanh tiêu đề và màn giới thiệu
-assets/favicon.svg          chỉ quả bi số 9, dùng làm favicon (cỡ 16px huy hiệu không đọc nổi)
+assets/logo-mark.svg        chỉ huy hiệu, dùng trong màn giới thiệu
+assets/favicon.svg          chỉ quả bi số 9 — favicon và logo thanh tiêu đề, vì ở cỡ nhỏ
+                            huy hiệu trắng viền vàng bị chìm trên nền kem
 assets/qr-techcombank.png   mã VietQR nhận lệ phí
 ```
 
