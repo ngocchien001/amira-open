@@ -431,13 +431,62 @@ main { padding: 4px 0 120px; }
   padding: 11px 18px 11px 12px;
   border: 0;
   border-radius: 999px;
-  background: linear-gradient(135deg, #f98a2b, #e2590a);
+  overflow: hidden;                      /* cắt vệt sáng theo đúng hình viên thuốc */
+  background: #c94f08;                   /* màu lộ ra ở viền khi vệt sáng đi qua */
   color: #fff;
   font-size: 14px;
-  box-shadow: 0 10px 26px rgba(215, 95, 15, .38);
   transition: transform .18s, box-shadow .18s;
+  animation: feeHalo 2.8s ease-in-out infinite;
 }
-.fee-fab:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(215, 95, 15, .46); }
+
+/* Vệt sáng chạy vòng quanh viền — báo cho người xem là bấm được */
+.fee-fab::before {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 280%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: conic-gradient(from 0turn,
+    rgba(255, 255, 255, 0) 0 42%,
+    rgba(255, 236, 205, .5) 56%,
+    #ffffff 68% 76%,
+    rgba(255, 224, 176, .6) 86%,
+    rgba(255, 255, 255, 0) 96% 100%);
+  filter: blur(2px);                     /* cho vệt sáng có quầng, dễ nhận ra hơn */
+  animation: feeSpin 3.2s linear infinite;
+  z-index: 0;
+}
+
+/* Mặt nút, chừa 3px viền cho vệt sáng chạy qua */
+.fee-fab::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #f98a2b, #e2590a);
+  z-index: 1;
+}
+
+.fee-fab > * { position: relative; z-index: 2; }
+
+@keyframes feeSpin {
+  to { transform: translate(-50%, -50%) rotate(1turn); }
+}
+
+@keyframes feeHalo {
+  0%, 100% { box-shadow: 0 10px 26px rgba(215, 95, 15, .38), 0 0 0 0 rgba(249, 138, 43, .5); }
+  70%      { box-shadow: 0 10px 26px rgba(215, 95, 15, .38), 0 0 0 15px rgba(249, 138, 43, 0); }
+}
+
+/* Đã rê chuột tới nghĩa là đã thấy nút — dừng hiệu ứng gây chú ý */
+.fee-fab:hover {
+  transform: translateY(-2px);
+  animation: none;
+  box-shadow: 0 14px 32px rgba(215, 95, 15, .46);
+}
+.fee-fab:hover::before { animation-duration: 1.6s; }
+
 .fee-fab-icon {
   width: 26px; height: 26px;
   display: grid; place-items: center;
@@ -598,7 +647,15 @@ main { padding: 4px 0 120px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *:not(.intro):not(.intro *) { animation: none !important; transition: none !important; }
+  /* Kể cả ::before / ::after — quy tắc chỉ dùng `*` sẽ bỏ sót hiệu ứng
+     vẽ bằng phần tử giả, ví dụ vệt sáng xoay của nút lệ phí.
+     Riêng màn giới thiệu vẫn giữ animation vì nó kết thúc dựa trên animationend. */
+  *:not(.intro):not(.intro *),
+  *:not(.intro):not(.intro *)::before,
+  *:not(.intro):not(.intro *)::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 .win-btn:disabled {

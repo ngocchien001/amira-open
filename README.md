@@ -44,8 +44,9 @@ Lần đầu mở trang sẽ chạy một đoạn animation:
   Thể thức của vòng sau được tính lại theo hạng của hai người vừa vào.
 - **Sửa kết quả**: bấm `Đặt lại` trong một trận sẽ xoá luôn kết quả các vòng sau phụ thuộc vào nó.
 - **Đánh dấu người trả tiền bàn**: người thua mỗi trận được gắn nhãn `trả tiền bàn`.
-- **Nút lệ phí ở góc màn hình**: mở popup mã VietQR để đóng lệ phí tham gia 50.000đ,
-  kèm nút sao chép số tài khoản.
+- **Nút lệ phí ở góc màn hình**: có vệt sáng chạy vòng quanh viền và quầng sáng đập
+  theo nhịp để người xem nhận ra là bấm được; rê chuột vào thì hiệu ứng gây chú ý tắt đi.
+  Bấm vào mở popup mã VietQR để đóng lệ phí tham gia 50.000đ, kèm nút sao chép số tài khoản.
 - **Lưu kết quả** vào `localStorage` của trình duyệt — tải lại trang không mất điểm.
   Nút `Đặt lại giải` ở thanh trên xoá toàn bộ.
 
