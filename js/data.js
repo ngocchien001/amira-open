@@ -59,7 +59,7 @@ const TOURNAMENT = {
      Điền URL ứng dụng web của Apps Script (xem apps-script/Code.gs) để mọi thiết bị
      nhìn chung một bảng kết quả. */
   sync: {
-    endpoint: '',
+    endpoint: 'https://script.google.com/macros/s/AKfycbyHw0WhLlplkHYSZ1hqu4X3MyfuicvxHVRPzT-i3l-Ho5PzQe2L_6YlS0Quuv89qoo/exec',
     pollSeconds: 10
   },
 
