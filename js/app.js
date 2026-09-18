@@ -603,7 +603,9 @@
   document.getElementById('feeAccount').textContent = TOURNAMENT.payment.accountDisplay;
   document.getElementById('feeContent').textContent = TOURNAMENT.payment.content;
   document.getElementById('feeQr').src = TOURNAMENT.payment.qr;
-  document.title = TOURNAMENT.name + ' — Nhánh đấu';
+  /* giữ cùng công thức với <title> tĩnh trong index.html để tiêu đề tab
+     không lệch với tiêu đề khi chia sẻ link */
+  document.title = TOURNAMENT.name + ' — Giải billiards ' + (TOURNAMENT.event && TOURNAMENT.event.format || '');
 
   /* Logo trên thanh tiêu đề: dùng bản quả bi cho tương phản cao ở cỡ nhỏ,
      huy hiệu trắng viền vàng bị chìm trên nền kem. */

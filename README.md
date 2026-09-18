@@ -54,6 +54,20 @@ Lần đầu mở trang sẽ chạy một đoạn animation:
   Nút `Đặt lại giải` ở thanh trên xoá toàn bộ.
 - **Đồng bộ nhiều thiết bị qua Google Sheet** (tuỳ chọn, xem mục dưới).
 
+## Ảnh khi chia sẻ link
+
+Các thẻ `og:` và `twitter:` trong `<head>` của `index.html` quyết định ảnh và
+dòng mô tả hiện ra khi dán link vào Facebook, Zalo, Messenger.
+
+**Bắt buộc đổi tên miền** trong bốn thẻ có `https://…` (`canonical`, `og:url`,
+`og:image`, `twitter:image`) cho khớp nơi trang được deploy. Trình quét link
+không chạy JavaScript và không hiểu đường dẫn tương đối — sai tên miền là ảnh
+không hiện.
+
+Đổi ảnh thì thay `assets/og-image.jpg`, giữ đúng tỉ lệ 1200×630. Facebook và
+Zalo có cache, sau khi đổi phải nhấn *Scrape Again* ở
+[Sharing Debugger](https://developers.facebook.com/tools/debug/) thì mới thấy ảnh mới.
+
 ## Đồng bộ kết quả qua Google Sheet
 
 Mặc định mỗi trình duyệt giữ một bảng kết quả riêng, hai người ở hai máy **không**
@@ -124,6 +138,7 @@ apps-script/Code.gs         code dán vào Apps Script của sheet
 js/intro.js                 màn giới thiệu: dựng nội dung, nút bỏ qua / tạm dừng
 js/app.js                   logic tính điểm, chấp ván, đi tiếp vòng trong, vẽ đường nối
 assets/intro-bg.jpg         ảnh nền của màn giới thiệu
+assets/og-image.jpg         ảnh hiện khi chia sẻ link (1200×630)
 assets/logo.svg             logo đầy đủ: huy hiệu kèm chữ AMIRA / OPEN (poster, mạng xã hội)
 assets/logo-mark.svg        chỉ huy hiệu, dùng trong màn giới thiệu
 assets/favicon.svg          chỉ quả bi số 9 — favicon và logo thanh tiêu đề, vì ở cỡ nhỏ
