@@ -1,0 +1,50 @@
+<svg width="200" height="200" class="logo logo-mark" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AMIRA OPEN — billiards 9 bi">
+<style>
+    .logo-text { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 15px; font-weight: 800; letter-spacing: 2.6px; fill: #fff; text-anchor: middle; }
+    .logo-text-sm { font-size: 12.5px; letter-spacing: 2.1px; fill: #fff5e8; }
+    .logo-num { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 27px; font-weight: 800; fill: #2a2118; text-anchor: middle; dominant-baseline: central; }
+  </style>
+<defs>
+<radialGradient id="aml2-ball" cx="36%" cy="30%" r="74%">
+<stop offset="0%" stop-color="#ffffff"/>
+<stop offset="58%" stop-color="#f7f0e5"/>
+<stop offset="100%" stop-color="#cbbca9"/>
+</radialGradient>
+<linearGradient id="aml2-stripe" x1="0%" y1="0%" x2="0%" y2="100%">
+<stop offset="0%" stop-color="#ffd84d"/>
+<stop offset="55%" stop-color="#f9b118"/>
+<stop offset="100%" stop-color="#e88c00"/>
+</linearGradient>
+<linearGradient id="aml2-ring" x1="6%" y1="0%" x2="94%" y2="100%">
+<stop offset="0%" stop-color="#fdb259"/>
+<stop offset="50%" stop-color="#ef6c1a"/>
+<stop offset="100%" stop-color="#c34706"/>
+</linearGradient>
+<radialGradient id="aml2-gloss" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ffffff" stop-opacity=".85"/>
+<stop offset="60%" stop-color="#ffffff" stop-opacity=".35"/>
+<stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+</radialGradient>
+<clipPath id="aml2-clip">
+<circle cx="100" cy="100" r="50"/>
+</clipPath>
+<path id="aml2-top" d="M 19 100 A 81 81 0 0 1 181 100" fill="none"/>
+<path id="aml2-bot" d="M 11 100 A 89 89 0 0 0 189 100" fill="none"/>
+</defs>
+<circle cx="100" cy="100" r="96" fill="url(#aml2-ring)"/>
+<circle cx="100" cy="100" r="84" fill="#fffaf3"/>
+<g transform="translate(100 100) scale(1.58) translate(-100 -100)">
+<g class="logo-ball">
+<circle cx="100" cy="100" r="50" fill="url(#aml2-ball)"/>
+<g clip-path="url(#aml2-clip)">
+<path d="M 46 78 Q 100 66 154 78 L 154 122 Q 100 134 46 122 Z" fill="url(#aml2-stripe)"/>
+</g>
+<circle cx="100" cy="100" r="23" fill="#fffdf9"/>
+<text class="logo-num" x="100" y="100">9</text>
+<ellipse cx="79" cy="74" rx="19" ry="12" fill="url(#aml2-gloss)" transform="rotate(-26 79 74)"/>
+<circle cx="100" cy="100" r="50" fill="none" stroke="#bda992" stroke-opacity=".45" stroke-width="1.6"/>
+</g>
+</g>
+</svg>
