@@ -989,3 +989,38 @@ main { padding: 4px 0 120px; }
 .intro-prize-value em { color: rgba(255, 238, 220, .72); }
 
 .intro-progress { background: rgba(255, 255, 255, .16); }
+
+/* ---------- Ô trạng thái đồng bộ ---------- */
+
+.sync-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.sync-chip[hidden] { display: none; }
+.sync-chip::before {
+  content: "";
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+.sync-chip.is-syncing { color: #b8860b; }
+.sync-chip.is-syncing::before { animation: syncBlink 1s ease-in-out infinite; }
+.sync-chip.is-ok { color: #157a3c; }
+.sync-chip.is-error { color: #c0392b; border-color: #f3c9c4; background: #fdeceb; }
+
+@keyframes syncBlink { 50% { opacity: .25; } }
+
+@media (max-width: 900px) {
+  .sync-chip { font-size: 12px; padding: 6px 12px; }
+}

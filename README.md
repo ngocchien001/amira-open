@@ -52,6 +52,65 @@ Lần đầu mở trang sẽ chạy một đoạn animation:
   Bấm vào mở popup mã VietQR để đóng lệ phí tham gia 50.000đ, kèm nút sao chép số tài khoản.
 - **Lưu kết quả** vào `localStorage` của trình duyệt — tải lại trang không mất điểm.
   Nút `Đặt lại giải` ở thanh trên xoá toàn bộ.
+- **Đồng bộ nhiều thiết bị qua Google Sheet** (tuỳ chọn, xem mục dưới).
+
+## Đồng bộ kết quả qua Google Sheet
+
+Mặc định mỗi trình duyệt giữ một bảng kết quả riêng, hai người ở hai máy **không**
+nhìn thấy điểm của nhau. Muốn cả giải chung một bảng thì nối trang với một Google Sheet.
+
+Trang tĩnh không ghi thẳng vào Sheets được, nên cần một Apps Script đứng giữa:
+
+```
+Trang web  ──GET──▶  Apps Script  ──▶  Sheet
+           ◀─JSON──  (chạy bằng quyền
+           ──POST─▶   của chủ sheet)
+```
+
+### Cài đặt
+
+1. Mở Google Sheet → **Tiện ích mở rộng → Apps Script**
+2. Xoá code mẫu, dán toàn bộ `apps-script/Code.gs` vào
+3. **Triển khai → Tuỳ chọn triển khai mới → Ứng dụng web**
+   - Thực thi với tư cách: **Tôi**
+   - Ai có quyền truy cập: **Bất kỳ ai**
+4. Copy URL ứng dụng web, dán vào `js/data.js`:
+
+```js
+sync: {
+  endpoint: 'https://script.google.com/macros/s/..../exec',
+  pollSeconds: 10
+}
+```
+
+Sheet **không cần công khai** — script chạy bằng quyền của chủ sheet. Script tự tạo
+hai sheet con: `_state` giữ JSON (dữ liệu chuẩn) và `Kết quả` là bảng cho người đọc.
+
+### Cách hoạt động
+
+- Bấm ghi điểm là lưu ngay xuống máy và vẽ lại luôn, không phải chờ mạng.
+- Thay đổi gửi lên sheet dưới dạng **patch từng trận**, không gửi cả bảng. Nhờ vậy
+  hai người sửa hai trận khác nhau cùng lúc thì không ai đè kết quả của ai.
+- Trang hỏi lại sheet mỗi `pollSeconds` giây (chỉ khi tab đang mở), nên máy khác
+  thấy điểm mới sau tối đa chừng đó giây — **không tức thì**.
+- Mất mạng vẫn ghi điểm được. Thay đổi nằm trong hàng đợi lưu ở `localStorage`,
+  có mạng lại thì tự gửi tiếp; trong lúc đó trang không nhận dữ liệu từ sheet về
+  để khỏi xoá mất điểm vừa bấm.
+- Ô trạng thái trên thanh tiêu đề báo: *Đang đồng bộ… / Đã đồng bộ với sheet /
+  Mất kết nối — đang lưu tạm trên máy*.
+
+### Giới hạn cần biết
+
+- **Ai mở được trang thì ghi được.** URL Apps Script nằm trong mã nguồn trang.
+  Với giải nội bộ thì chấp nhận được; đây không phải cơ chế bảo mật.
+- Apps Script có hạn mức thời gian chạy mỗi ngày. Một buổi giải với vài người xem,
+  hỏi lại mỗi 10 giây thì thoải mái; đừng đặt `pollSeconds` quá nhỏ hoặc mở trang
+  cả ngày trên nhiều máy.
+- Bảng `Kết quả` được dựng từ dữ liệu của máy vừa ghi. Nếu hai người bấm cùng lúc,
+  bảng cho người đọc có thể chậm một nhịp — `_state` thì luôn đúng, và lần ghi kế
+  tiếp sẽ dựng lại bảng cho khớp.
+- Danh sách người chơi, hạng, thể thức vẫn nằm trong `js/data.js`, đổi thì phải
+  deploy lại trang.
 
 ## Cấu trúc
 
@@ -60,6 +119,8 @@ index.html                  khung trang + popup lệ phí
 styles.css                  toàn bộ giao diện, gồm cả mốc thời gian của animation
 js/logo.js                  logo SVG (bản đầy đủ có vòng chữ, bản rút gọn cho thanh tiêu đề)
 js/data.js                  dữ liệu giải: người chơi, hạng, nhánh đấu, thông tin sự kiện, thanh toán
+js/store.js                 lưu trữ: localStorage + đồng bộ tuỳ chọn qua Google Sheet
+apps-script/Code.gs         code dán vào Apps Script của sheet
 js/intro.js                 màn giới thiệu: dựng nội dung, nút bỏ qua / tạm dừng
 js/app.js                   logic tính điểm, chấp ván, đi tiếp vòng trong, vẽ đường nối
 assets/intro-bg.jpg         ảnh nền của màn giới thiệu
@@ -87,6 +148,8 @@ Chỉ cần sửa `js/data.js`:
 - `TOURNAMENT.prizes` — danh sách giải thưởng (thêm bớt bao nhiêu dòng cũng được).
 - `TOURNAMENT.intro.showOnce` — `false` (mặc định) chạy animation mỗi lần tải trang,
   `true` thì chỉ chạy lần đầu trên mỗi trình duyệt.
+- `TOURNAMENT.sync.endpoint` — URL Apps Script để đồng bộ nhiều máy. Để rỗng thì
+  trang chạy hoàn toàn cục bộ.
 
 Muốn ép thể thức riêng cho một trận, thêm `format` vào trận đó:
 

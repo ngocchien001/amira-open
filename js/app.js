@@ -7,8 +7,6 @@
 (function () {
   'use strict';
 
-  var STORAGE_KEY = 'amira-open:bracket:v1';
-
   /* ---------- Chỉ mục dữ liệu ---------- */
 
   var playerById = {};
@@ -34,21 +32,38 @@
   /* ---------- Trạng thái ---------- */
 
   /* state[matchId] = { a: <ván tự thắng>, b: <ván tự thắng>, winner: 'a'|'b'|null } */
-  var state = load();
+  var state = Store.loadLocal();
 
-  function load() {
-    try {
-      var raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : {};
-    } catch (e) {
-      return {};
-    }
+  /* Lúc render, scoreOf() tạo sẵn ô rỗng cho mọi trận. Không lưu và không gửi đi
+     những ô đó, để so sánh với dữ liệu từ sheet không bị lệch giả. */
+  function prune(src) {
+    var out = {};
+    Object.keys(src).forEach(function (id) {
+      var s = src[id];
+      if (s && (s.a || s.b || s.winner)) out[id] = s;
+    });
+    return out;
   }
 
-  function save() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (e) { /* chế độ riêng tư: bỏ qua, vẫn chạy trong phiên */ }
+  /* Ghi lại thay đổi: luôn lưu cục bộ + vẽ lại ngay, rồi mới gửi lên sheet.
+     Trang không phải chờ mạng, mất mạng vẫn ghi điểm bình thường. */
+  function commit(patch) {
+    Store.saveLocal(prune(state));
+    render();
+    if (!Store.enabled()) return;
+    patch.board = boardRows();
+    Store.send(patch, adopt);
+  }
+
+  /* Nhận dữ liệu từ sheet. Chỉ vẽ lại khi thực sự khác, tránh nhấp nháy. */
+  function adopt(remote) {
+    if (!remote) return;
+    /* Còn thay đổi chưa gửi được thì màn hình đang đúng hơn sheet — giữ nguyên */
+    if (Store.hasPending()) return;
+    if (JSON.stringify(remote) === JSON.stringify(prune(state))) return;
+    state = remote;
+    Store.saveLocal(prune(state));
+    render();
   }
 
   function scoreOf(matchId) {
@@ -119,11 +134,14 @@
   /* ---------- Thao tác ---------- */
 
   function clearDownstream(matchId) {
+    var cleared = [];
     var next = nextOf[matchId];
     while (next) {
       delete state[next.match.id];
+      cleared.push(next.match.id);
       next = nextOf[next.match.id];
     }
+    return cleared;
   }
 
   function addGame(matchId, side, delta) {
@@ -146,9 +164,9 @@
       if (displayScore(matchId, sd, fmt) >= fmt.raceTo) s.winner = sd;
     });
 
-    if (before !== s.winner) clearDownstream(matchId);
-    save();
-    render();
+    var cleared = (before !== s.winner) ? clearDownstream(matchId) : [];
+    var set = {}; set[matchId] = s;
+    commit({ set: set, clear: cleared });
   }
 
   function pickWinner(matchId, side) {
@@ -169,22 +187,20 @@
     s[other] = Math.min(s[other], Math.max(0, otherCap));
     s.winner = side;
 
-    clearDownstream(matchId);
-    save();
-    render();
+    var cleared = clearDownstream(matchId);
+    var set = {}; set[matchId] = s;
+    commit({ set: set, clear: cleared });
   }
 
   function resetMatch(matchId) {
     delete state[matchId];
-    clearDownstream(matchId);
-    save();
-    render();
+    var cleared = clearDownstream(matchId);
+    commit({ clear: [matchId].concat(cleared) });
   }
 
   function resetAll() {
     state = {};
-    save();
-    render();
+    commit({ replaceAll: true, state: {} });
   }
 
   /* ---------- Render ---------- */
@@ -379,6 +395,45 @@
     requestAnimationFrame(drawConnectors);
   }
 
+  /* ---------- Bảng gửi lên sheet cho người đọc ---------- */
+
+  function boardRows() {
+    var rows = [[
+      'Mã trận', 'Vòng', 'Thể thức',
+      'Tay cơ A', 'Điểm A', 'Điểm B', 'Tay cơ B',
+      'Người thắng', 'Trả tiền bàn'
+    ]];
+
+    TOURNAMENT.rounds.forEach(function (round) {
+      round.matches.forEach(function (m) {
+        var a = playerAt(m, 'a');
+        var b = playerAt(m, 'b');
+        var fmt = formatOf(m, a, b);
+        var s = state[m.id] || { a: 0, b: 0, winner: null };
+        var w = s.winner ? playerAt(m, s.winner) : null;
+        var l = s.winner ? playerAt(m, s.winner === 'a' ? 'b' : 'a') : null;
+
+        rows.push([
+          m.id,
+          round.name,
+          fmt ? formatLabel(fmt) : 'Chưa xác định',
+          a ? a.name + ' (' + a.rank + ')' : '',
+          fmt && a ? displayScore(m.id, 'a', fmt) : '',
+          fmt && b ? displayScore(m.id, 'b', fmt) : '',
+          b ? b.name + ' (' + b.rank + ')' : '',
+          w ? w.name : '',
+          l ? l.name : ''
+        ]);
+      });
+    });
+
+    var champ = state[finalMatch.id] && state[finalMatch.id].winner
+      ? playerAt(finalMatch, state[finalMatch.id].winner) : null;
+    rows.push(['', '', '', '', '', '', '', 'Vô địch: ' + (champ ? champ.name : '—'), '']);
+
+    return rows;
+  }
+
   /* ---------- Đường nối giữa các trận ---------- */
 
   function drawConnectors() {
@@ -558,7 +613,29 @@
     Intro.play();
   });
 
+  /* ---------- Trạng thái đồng bộ ---------- */
+
+  var syncChip = document.getElementById('syncChip');
+  var SYNC_TEXT = {
+    syncing: 'Đang đồng bộ…',
+    ok: 'Đã đồng bộ với sheet',
+    error: 'Mất kết nối — đang lưu tạm trên máy'
+  };
+
+  function showSync(kind, detail) {
+    if (!syncChip) return;
+    syncChip.hidden = false;
+    syncChip.className = 'sync-chip is-' + kind;
+    syncChip.textContent = SYNC_TEXT[kind] || '';
+    syncChip.title = detail ? String(detail) : '';
+  }
+
+  Store.init(TOURNAMENT, showSync);
+
   render();
   window.addEventListener('load', drawConnectors);
   Intro.autoPlay();
+
+  /* Sheet là dữ liệu chuẩn: gửi nốt thay đổi còn tồn, lấy về, rồi hỏi lại định kỳ */
+  Store.start(adopt);
 })();

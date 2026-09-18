@@ -54,6 +54,15 @@ const TOURNAMENT = {
        Dù đặt thế nào vẫn xem lại được bằng nút "Giới thiệu" trên thanh tiêu đề. */
     showOnce: false
   },
+  /* Đồng bộ kết quả qua Google Sheet.
+     Để endpoint rỗng thì trang chạy hoàn toàn cục bộ như cũ (mỗi máy một bảng riêng).
+     Điền URL ứng dụng web của Apps Script (xem apps-script/Code.gs) để mọi thiết bị
+     nhìn chung một bảng kết quả. */
+  sync: {
+    endpoint: '',
+    pollSeconds: 10
+  },
+
   payment: {
     bank: 'Techcombank',
     holder: 'NGUYEN HOANG ANH',
