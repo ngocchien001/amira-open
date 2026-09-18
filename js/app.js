@@ -214,6 +214,24 @@
     return last.charAt(0).toUpperCase();
   }
 
+  /* Ảnh đại diện đặt ở assets/players/<id>.jpg — <id> chính là tên không dấu
+     khai báo trong data.js. Thiếu file thì tự rơi về chữ cái đầu của tên.
+     Ghi nhớ id nào không có ảnh để những lần vẽ lại sau khỏi gọi lại vô ích. */
+  var noPhoto = {};
+
+  function attachPhoto(node, p) {
+    if (noPhoto[p.id]) return;
+    var img = document.createElement('img');
+    img.className = 'avatar-photo';
+    img.alt = '';
+    img.addEventListener('error', function () {
+      noPhoto[p.id] = true;
+      img.remove();
+    });
+    img.src = 'assets/players/' + p.id + '.jpg';
+    node.appendChild(img);
+  }
+
   function hue(id) {
     var h = 0;
     for (var i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 360;
@@ -249,6 +267,7 @@
 
     var av = el('div', 'avatar', initials(p.name));
     av.style.setProperty('--h', hue(p.id));
+    attachPhoto(av, p);
 
     var who = el('div', 'who');
     who.appendChild(el('span', 'name', p.name));
@@ -367,6 +386,7 @@
     var av = el('div', 'avatar avatar-lg' + (champ ? '' : ' avatar-empty'), champ ? initials(champ.name) : '?');
     if (champ) {
       av.style.setProperty('--h', hue(champ.id));
+      attachPhoto(av, champ);
       box.classList.add('is-crowned');
     }
     box.appendChild(av);

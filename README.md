@@ -139,6 +139,7 @@ js/intro.js                 màn giới thiệu: dựng nội dung, nút bỏ qu
 js/app.js                   logic tính điểm, chấp ván, đi tiếp vòng trong, vẽ đường nối
 assets/intro-bg.jpg         ảnh nền của màn giới thiệu
 assets/og-image.jpg         ảnh hiện khi chia sẻ link (1200×630)
+assets/players/<id>.jpg     ảnh đại diện từng tay cơ, <id> là tên không dấu trong data.js
 assets/logo.svg             logo đầy đủ: huy hiệu kèm chữ AMIRA / OPEN (poster, mạng xã hội)
 assets/logo-mark.svg        chỉ huy hiệu, dùng trong màn giới thiệu
 assets/favicon.svg          chỉ quả bi số 9 — favicon và logo thanh tiêu đề, vì ở cỡ nhỏ
@@ -149,6 +150,19 @@ assets/qr-techcombank.png   mã VietQR nhận lệ phí
 Toàn bộ mốc thời gian của animation nằm trong CSS (`.intro { --spin, --shift-at, --info-at,
 --total ... }`), nên nút Tạm dừng chỉ cần đặt `animation-play-state: paused` là mọi thứ
 dừng đúng chỗ — không có `setTimeout` nào phải đồng bộ thủ công.
+
+## Ảnh đại diện tay cơ
+
+Đặt ảnh vuông vào `assets/players/` với tên file đúng bằng `id` của người chơi
+trong `js/data.js` — tức tên không dấu, ví dụ `bien.jpg`, `hoanganh.jpg`.
+Không cần sửa code: trang tự tìm theo `id`.
+
+Ai chưa có ảnh thì hiện chữ cái đầu của tên trên nền màu, nên thiếu ảnh vẫn chạy
+bình thường. Trang chỉ thử tải một lần cho mỗi người; thiếu file thì lần vẽ lại
+sau không gọi nữa.
+
+Ảnh nên cắt vuông, khuôn mặt ở giữa, cạnh khoảng 320px là đủ nét cho cả ô
+nhà vô địch.
 
 ## Sửa dữ liệu giải
 
