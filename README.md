@@ -59,10 +59,10 @@ Lần đầu mở trang sẽ chạy một đoạn animation:
 Các thẻ `og:` và `twitter:` trong `<head>` của `index.html` quyết định ảnh và
 dòng mô tả hiện ra khi dán link vào Facebook, Zalo, Messenger.
 
-**Bắt buộc đổi tên miền** trong bốn thẻ có `https://…` (`canonical`, `og:url`,
-`og:image`, `twitter:image`) cho khớp nơi trang được deploy. Trình quét link
-không chạy JavaScript và không hiểu đường dẫn tương đối — sai tên miền là ảnh
-không hiện.
+Trang đang chạy tại **https://amira-open.vercel.app/**. Nếu đổi tên miền thì
+phải sửa cả bốn thẻ có `https://…` (`canonical`, `og:url`, `og:image`,
+`twitter:image`). Trình quét link không chạy JavaScript và không hiểu đường dẫn
+tương đối — sai tên miền là ảnh không hiện.
 
 Đổi ảnh thì thay `assets/og-image.jpg`, giữ đúng tỉ lệ 1200×630. Facebook và
 Zalo có cache, sau khi đổi phải nhấn *Scrape Again* ở
