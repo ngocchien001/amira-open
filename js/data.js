@@ -15,7 +15,7 @@ const PLAYERS = [
   { id: 'phuc',     name: 'Phúc',      rank: 'H' },
   { id: 'hung',     name: 'Hưng',      rank: 'F' },
   { id: 'hieu',     name: 'Hiếu',      rank: 'H' },
-  { id: 'bien',     name: 'Biển',      rank: 'H' },
+  { id: 'nguyen',   name: 'Nguyên',    rank: 'H' },
 ];
 
 /* Luật thể thức mặc định — suy ra từ chênh lệch hạng của 2 tay cơ:
@@ -96,7 +96,7 @@ const TOURNAMENT = {
         { id: 'qf1', a: { player: 'phuong' }, b: { player: 'nam' } },
         { id: 'qf2', a: { player: 'chien' },  b: { player: 'hoanganh' } },
         { id: 'qf3', a: { player: 'phuc' },   b: { player: 'hung' } },
-        { id: 'qf4', a: { player: 'hieu' },   b: { player: 'bien' } },
+        { id: 'qf4', a: { player: 'hieu' },   b: { player: 'nguyen' } },
       ]
     },
     {
