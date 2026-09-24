@@ -72,12 +72,13 @@ const TOURNAMENT = {
     pollSeconds: 10
   },
 
-  /* Dự đoán vui — không cá cược bằng tiền: rủ một người khác lập "kèo" cho một
-     trận, mỗi người cược một bên thắng; ai đoán đúng thì người kia đãi bữa trưa.
-     Không cần mật khẩu, ai xem trang cũng lập kèo được. Dùng chung endpoint ở
-     TOURNAMENT.sync (đồng bộ qua kênh riêng trên cùng sheet). */
+  /* Dự đoán vui — không cá cược bằng tiền: mỗi trận là một kèo chung, ai xem
+     trang cũng gõ tên rồi chọn một bên sẽ thắng, không giới hạn số người mỗi
+     bên. Trận xong thì phe đoán sai đãi phe đoán đúng một bữa trưa — không
+     tính điểm, không có bảng xếp hạng. Không cần mật khẩu. Dùng chung endpoint
+     ở TOURNAMENT.sync (đồng bộ qua kênh riêng trên cùng sheet). */
   predict: {
-    prizeNote: 'Rủ nhau lập kèo mỗi trận — ai đoán sai thì đãi người kia một bữa trưa 🍜'
+    prizeNote: 'Chọn đúng phe thắng — phe đoán sai đãi phe đoán đúng một bữa trưa 🍜'
   },
 
   payment: {
