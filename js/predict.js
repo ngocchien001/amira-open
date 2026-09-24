@@ -107,6 +107,86 @@
     return out;
   }
 
+  /* ---------- Xuất file kết quả (CSV) ---------- */
+
+  function csvCell(v) {
+    var s = String(v == null ? '' : v);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+
+  function toCsv(table) {
+    return table.map(function (row) { return row.map(csvCell).join(','); }).join('\r\n');
+  }
+
+  /* Gom đủ thông tin liên quan vào một file: kết quả từng trận, từng lượt
+     tham gia dự đoán, và tổng kết đúng/sai theo tên (chỉ để tham khảo khi
+     tính ai đãi ai bữa trưa — không phải bảng xếp hạng). */
+  function buildExportTable() {
+    var out = [];
+    out.push([TOURNAMENT.name + ' — Xuất kết quả dự đoán']);
+    out.push(['Xuất lúc', new Date().toLocaleString('vi-VN')]);
+    out.push([]);
+
+    out.push(['KẾT QUẢ TRẬN ĐẤU']);
+    out.push(['Vòng', 'Mã trận', 'Tay cơ A', 'Tay cơ B', 'Thể thức', 'Tỉ số', 'Người thắng']);
+    TOURNAMENT.rounds.forEach(function (round) {
+      round.matches.forEach(function (m) {
+        var a = Bracket.playerAt(m, 'a');
+        var b = Bracket.playerAt(m, 'b');
+        var fmt = Bracket.formatOf(m, a, b);
+        var s = Bracket.state(m.id);
+        var score = (s && fmt) ? Bracket.displayScore(m.id, 'a', fmt) + '–' + Bracket.displayScore(m.id, 'b', fmt) : '';
+        var winner = (s && s.winner) ? Bracket.playerAt(m, s.winner).name : '';
+        var fmtLabel = fmt ? (fmt.handicap ? fmt.raceTo + ' bi · chấp ' + fmt.handicap : 'Chạm ' + fmt.raceTo) : '';
+        out.push([round.name, m.id, a ? a.name : '', b ? b.name : '', fmtLabel, score, winner]);
+      });
+    });
+    out.push([]);
+
+    out.push(['LƯỢT THAM GIA DỰ ĐOÁN']);
+    out.push(['Vòng', 'Mã trận', 'Tên', 'Chọn', 'Kết quả']);
+    var tally = {}; // tên -> { correct, wrong, total }
+    TOURNAMENT.rounds.forEach(function (round) {
+      round.matches.forEach(function (m) {
+        var s = Bracket.state(m.id);
+        rowsOfMatch(m.id).forEach(function (r) {
+          var pick = Bracket.playerAt(m, r.side);
+          var result = (s && s.winner) ? (r.side === s.winner ? 'Đúng' : 'Sai') : 'Đang chờ';
+          out.push([round.name, m.id, r.name, pick ? pick.name : r.side, result]);
+
+          var t = tally[r.name] || (tally[r.name] = { correct: 0, wrong: 0, total: 0 });
+          t.total++;
+          if (result === 'Đúng') t.correct++;
+          else if (result === 'Sai') t.wrong++;
+        });
+      });
+    });
+    out.push([]);
+
+    out.push(['TỔNG KẾT THEO TÊN (để tham khảo khi tính ai đãi ai — không xếp hạng)']);
+    out.push(['Tên', 'Đoán đúng', 'Đoán sai', 'Đang chờ kết quả', 'Tổng lượt tham gia']);
+    Object.keys(tally).sort().forEach(function (name) {
+      var t = tally[name];
+      out.push([name, t.correct, t.wrong, t.total - t.correct - t.wrong, t.total]);
+    });
+
+    return out;
+  }
+
+  function exportCsv() {
+    var csv = '﻿' + toCsv(buildExportTable()); // BOM để Excel đọc đúng dấu tiếng Việt
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'amira-open-du-doan-' + stamp + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
   /* ---------- Giao diện ---------- */
 
   var modal = document.getElementById('predictModal');
@@ -115,6 +195,7 @@
   var nameListEl = document.getElementById('predictNames');
   var nameInput = document.getElementById('predictName');
   var openBtn = document.getElementById('predictBtn');
+  var exportBtn = document.getElementById('predictExportBtn');
   var toastEl = document.getElementById('toast');
   var toastTimer;
 
@@ -255,6 +336,8 @@
     nameInput.value = loadName();
     nameInput.addEventListener('input', render);
   }
+
+  if (exportBtn) exportBtn.addEventListener('click', exportCsv);
 
   if (openBtn && modal) {
     var lastFocus = null;
