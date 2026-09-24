@@ -75,6 +75,12 @@ kèo của trận đó.
   khoá thì hiện đủ tên từng bên, kèm gạch ngang nếu đoán sai khi trận đã xong.
 - **Tự giải quyết khi có kết quả**: trận xong hiện luôn "phe nào đúng, phe nào
   phải đãi bữa trưa" ngay dưới trận đó, không cần tính toán gì thêm.
+- **Xuất file kết quả**: nút `⬇️ Xuất file kết quả (CSV)` trong popup tải về
+  một file `.csv` gồm ba phần — kết quả từng trận (tay cơ, thể thức, tỉ số,
+  người thắng), toàn bộ lượt tham gia dự đoán (ai chọn ai, đúng/sai), và một
+  bảng tổng kết đúng/sai theo tên để dễ tính ai đãi ai (không phải bảng xếp
+  hạng). Mở tốt bằng Excel/Google Sheets (đã kèm BOM UTF-8 cho đúng dấu
+  tiếng Việt).
 - **Lưu trữ**: giống kết quả trận đấu — `localStorage` cục bộ, và đồng bộ qua
   Google Sheet nếu đã cấu hình `TOURNAMENT.sync.endpoint` (dùng chung endpoint,
   tách bảng riêng, xem mục Đồng bộ bên dưới — **⚠️ phải dán lại `Code.gs` và
