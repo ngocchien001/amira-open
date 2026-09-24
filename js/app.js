@@ -131,6 +131,20 @@
     return playerAt(match, w === 'a' ? 'b' : 'a');
   }
 
+  /* API công khai tối thiểu cho js/predict.js: đọc trạng thái trận đấu (ai đang
+     ở vị trí nào, đã có kết quả chưa) mà không phải nhân đôi logic tính thể
+     thức/chấp ván hay đi ngược nhánh đấu ở một file khác. */
+  window.Bracket = {
+    playerAt: playerAt,
+    formatOf: formatOf,
+    displayScore: displayScore,
+    state: function (matchId) { return state[matchId]; },
+    isStarted: function (matchId) {
+      var s = state[matchId];
+      return !!(s && (s.a || s.b || s.winner));
+    }
+  };
+
   /* ---------- Thao tác ---------- */
 
   function clearDownstream(matchId) {
@@ -413,6 +427,7 @@
     });
 
     requestAnimationFrame(drawConnectors);
+    window.dispatchEvent(new CustomEvent('amira:bracket-changed'));
   }
 
   /* ---------- Bảng gửi lên sheet cho người đọc ---------- */

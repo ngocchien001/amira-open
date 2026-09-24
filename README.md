@@ -56,6 +56,31 @@ Lần đầu mở trang sẽ chạy một đoạn animation:
   Nút `Đặt lại giải` ở thanh trên xoá toàn bộ.
 - **Đồng bộ nhiều thiết bị qua Google Sheet** (tuỳ chọn, xem mục dưới).
 
+### Dự đoán vui (không cá cược bằng tiền)
+
+Nút **🍜 Dự đoán** trên thanh tiêu đề mở popup cho ai xem trang cũng đoán được —
+không cần mật khẩu, không dùng tiền, ai đoán đúng nhiều nhất thì được cả hội đãi
+một bữa trưa.
+
+- **Gõ tên rồi chọn người thắng** từng trận. Tên được nhớ trong trình duyệt cho
+  lần sau khỏi gõ lại.
+- **Đoán thêm tỉ số (tuỳ chọn)**: sau khi chọn người thắng, nhập tỉ số dự đoán —
+  đoán đúng cả tỉ số hiển thị (đã cộng chấp) thì được điểm thưởng.
+- **Tự khoá theo từng trận**: ngay khi một trận có điểm đầu tiên, dự đoán của
+  trận đó khoá lại — không ai đoán ăn theo kết quả đang diễn ra. Các trận khác
+  vẫn mở bình thường.
+- **Giấu lượt đoán của người khác cho tới khi khoá**: trước khi trận bắt đầu,
+  chỉ thấy số người đã đoán (không thấy đoán ai) để khỏi chọn theo số đông; sau
+  khi khoá thì công khai hết, kèm dấu đúng/sai khi trận đã có kết quả.
+- **Tính điểm**: đoán đúng người thắng +1 điểm, đoán đúng luôn tỉ số +1 điểm
+  nữa. Bảng xếp hạng cập nhật dần khi có kết quả từng trận.
+- **Lưu trữ**: giống kết quả trận đấu — `localStorage` cục bộ, và đồng bộ qua
+  Google Sheet nếu đã cấu hình `TOURNAMENT.sync.endpoint` (dùng chung endpoint,
+  tách bảng riêng, xem mục Đồng bộ bên dưới — **⚠️ phải dán lại `Code.gs` và
+  triển khai lại trước khi dùng, không thì dữ liệu dự đoán sẽ đè lên bảng kết
+  quả trận đấu**).
+- Đổi lời nhắn giải thưởng ở `TOURNAMENT.predict.prizeNote` trong `js/data.js`.
+
 ## Khoá chỉnh sửa
 
 Trang mở ra ở **chế độ chỉ xem**: ai cũng xem được nhánh đấu và kết quả, nhưng bấm
@@ -121,7 +146,15 @@ sync: {
 ```
 
 Sheet **không cần công khai** — script chạy bằng quyền của chủ sheet. Script tự tạo
-hai sheet con: `_state` giữ JSON (dữ liệu chuẩn) và `Kết quả` là bảng cho người đọc.
+bốn sheet con, tách theo hai kênh dữ liệu (kết quả trận và dự đoán):
+`_state` / `Kết quả` cho nhánh đấu, `_predict` / `Dự đoán` cho tính năng dự đoán vui.
+
+> ⚠️ **Đã đồng bộ từ trước, giờ có thêm tính năng Dự đoán?** Bản `Code.gs` cũ chỉ
+> biết một bảng dữ liệu duy nhất — nếu chưa dán lại code mới rồi **Triển khai →
+> Quản lý các bản triển khai → Sửa (biểu tượng bút chì) → Phiên bản: Mới → Triển
+> khai** thì dữ liệu dự đoán sẽ bị ghi lẫn vào `_state`/`Kết quả` của nhánh đấu,
+> làm hỏng kết quả trận đấu đang có. Luôn dán lại toàn bộ `apps-script/Code.gs`
+> và triển khai bản mới mỗi khi file này thay đổi.
 
 ### Cách hoạt động
 
@@ -157,11 +190,12 @@ index.html                  khung trang + popup lệ phí + popup mật khẩu
 styles.css                  toàn bộ giao diện, gồm cả mốc thời gian của animation
 js/logo.js                  logo SVG: createLogo('full' | 'mark' | 'icon')
 js/data.js                  dữ liệu giải: người chơi, hạng, nhánh đấu, thông tin sự kiện, thanh toán
-js/store.js                 lưu trữ: localStorage + đồng bộ tuỳ chọn qua Google Sheet
+js/store.js                 lưu trữ: localStorage + đồng bộ tuỳ chọn qua Google Sheet (nhiều kênh)
 js/access.js                khoá chỉnh sửa: hỏi mật khẩu trước khi cho ghi điểm
-apps-script/Code.gs         code dán vào Apps Script của sheet
+apps-script/Code.gs         code dán vào Apps Script của sheet (kênh bracket + predict)
 js/intro.js                 màn giới thiệu: dựng nội dung, nút bỏ qua / tạm dừng
 js/app.js                   logic tính điểm, chấp ván, đi tiếp vòng trong, vẽ đường nối
+js/predict.js               dự đoán vui: ai thắng / tỉ số, khoá theo trận, bảng xếp hạng
 assets/intro-bg.jpg         ảnh nền của màn giới thiệu
 assets/og-image.jpg         ảnh hiện khi chia sẻ link (1200×630)
 assets/players/<id>.jpg     ảnh đại diện từng tay cơ, <id> là tên không dấu trong data.js
@@ -208,6 +242,7 @@ Chỉ cần sửa `js/data.js`:
   trang chạy hoàn toàn cục bộ.
 - `TOURNAMENT.access.editPassword` — mật khẩu để được chỉnh sửa (mặc định `amira`).
   Để rỗng thì bỏ khoá, ai mở trang cũng ghi điểm được.
+- `TOURNAMENT.predict.prizeNote` — dòng chữ mô tả giải thưởng hiện trong popup Dự đoán.
 
 Muốn ép thể thức riêng cho một trận, thêm `format` vào trận đó:
 

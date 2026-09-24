@@ -72,6 +72,13 @@ const TOURNAMENT = {
     pollSeconds: 10
   },
 
+  /* Dự đoán vui — không cá cược bằng tiền: ai xem trang cũng đoán được người
+     thắng (và tuỳ chọn tỉ số) từng trận, gõ tên là đoán ngay, không cần mật khẩu.
+     Dùng chung endpoint ở TOURNAMENT.sync (đồng bộ qua kênh riêng trên cùng sheet). */
+  predict: {
+    prizeNote: 'Ai đoán đúng nhiều trận nhất được cả hội đãi 1 bữa trưa 🍜'
+  },
+
   payment: {
     bank: 'Techcombank',
     holder: 'NGUYEN HOANG ANH',

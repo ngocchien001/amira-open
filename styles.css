@@ -1150,3 +1150,161 @@ body.is-locked .link-btn { cursor: pointer; }
 @media (max-width: 900px) {
   .btn-lock { font-size: 13px; padding: 8px 13px; }
 }
+
+/* ---------- Dự đoán vui (không cá cược bằng tiền) ---------- */
+
+.modal-card-predict {
+  width: min(480px, 100%);
+  text-align: left;
+}
+
+.predict-name-input {
+  font: inherit;
+  width: 100%;
+  margin-top: 14px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+}
+.predict-name-input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent-line);
+}
+
+.predict-list {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 46vh;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.predict-match {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  padding: 10px 12px;
+}
+
+.predict-match-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.predict-round {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.predict-locked {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: var(--accent-soft);
+  border-radius: 999px;
+  padding: 2px 9px;
+}
+
+.predict-empty { margin: 0; font-size: 13px; color: var(--ink-3); }
+
+.predict-pick {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.predict-pick-btn {
+  flex: 1 1 0;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+}
+.predict-pick-btn:hover:not(:disabled) { border-color: var(--accent-line); background: var(--accent-soft); }
+.predict-pick-btn:disabled { cursor: default; opacity: .75; }
+.predict-pick-btn.is-picked {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+.predict-pick-btn.is-actual-winner { border-color: var(--win); }
+.predict-pick-btn.is-wrong { color: #b3261e; text-decoration: line-through; }
+.predict-vs { font-size: 11px; color: var(--ink-3); flex: none; }
+
+.predict-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.predict-score-input {
+  font: inherit;
+  width: 56px;
+  text-align: center;
+  padding: 5px 4px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+}
+.predict-score-sep { color: var(--ink-3); }
+
+.predict-hint {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+.predict-count {
+  margin: 8px 0 0;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+.predict-others {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 8px 0 0;
+  border-top: 1px dashed var(--accent-line);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.predict-others .is-correct { color: #157a3c; font-weight: 600; }
+.predict-others .is-wrong { color: var(--ink-3); }
+
+.predict-board {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--accent-line);
+}
+.predict-board-title { margin: 0; font-size: 15px; font-weight: 800; }
+.predict-board-note { margin: 4px 0 10px; font-size: 12.5px; color: var(--ink-2); }
+
+.predict-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.predict-table th, .predict-table td {
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.predict-table th { color: var(--ink-3); font-size: 11px; text-transform: uppercase; letter-spacing: .03em; }
+.predict-table tr.is-leader td { font-weight: 700; color: var(--accent-ink); }

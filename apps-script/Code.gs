@@ -1,5 +1,5 @@
 /**
- * AMIRA OPEN — lưu kết quả giải vào Google Sheet.
+ * AMIRA OPEN — lưu kết quả giải + dự đoán vào Google Sheet.
  *
  * CÁCH CÀI (làm một lần, khoảng 3 phút):
  *   1. Mở Google Sheet  ->  Tiện ích mở rộng  ->  Apps Script
@@ -11,18 +11,26 @@
  *
  * Sheet KHÔNG cần công khai: script chạy bằng quyền của chủ sheet.
  *
- * Script tạo và dùng hai sheet con:
- *   _state    - một ô JSON, đây mới là dữ liệu chuẩn để trang web đọc lại
- *   Kết quả   - bảng cho người đọc, tự dựng lại sau mỗi lần ghi
+ * Dữ liệu tách theo "kênh" (tham số `channel` trên mỗi request), mỗi kênh có
+ * một sheet dữ liệu chuẩn (JSON) và một sheet bảng cho người đọc:
+ *   bracket  (mặc định) - kết quả trận đấu   -> _state  / Kết quả
+ *   predict                - dự đoán vui       -> _predict / Dự đoán
  */
 
-var STATE_SHEET = '_state';
-var BOARD_SHEET = 'Kết quả';
+var CHANNELS = {
+  bracket: { stateSheet: '_state', boardSheet: 'Kết quả' },
+  predict: { stateSheet: '_predict', boardSheet: 'Dự đoán' }
+};
+
+function channelOf(name) {
+  return CHANNELS[name] || CHANNELS.bracket;
+}
 
 /* ---------- Điểm vào ---------- */
 
-function doGet() {
-  return respond({ ok: true, state: readState(), updatedAt: readUpdatedAt() });
+function doGet(e) {
+  var ch = channelOf(e && e.parameter && e.parameter.channel);
+  return respond({ ok: true, state: readState(ch), updatedAt: readUpdatedAt(ch) });
 }
 
 function doPost(e) {
@@ -35,23 +43,24 @@ function doPost(e) {
 
   try {
     var body = JSON.parse(e.postData.contents);
-    var state = readState();
+    var ch = channelOf(body.channel);
+    var state = readState(ch);
 
     if (body.replaceAll) {
-      /* Đặt lại toàn giải */
+      /* Đặt lại toàn bộ dữ liệu của kênh này */
       state = body.state || {};
     } else {
       /* Gộp thay đổi vào dữ liệu đang có, nhờ vậy hai người sửa hai trận
-         khác nhau cùng lúc không ghi đè kết quả của nhau. */
+         (hoặc hai dự đoán) khác nhau cùng lúc không ghi đè kết quả của nhau. */
       (body.clear || []).forEach(function (id) { delete state[id]; });
       var set = body.set || {};
       Object.keys(set).forEach(function (id) { state[id] = set[id]; });
     }
 
-    writeState(state);
-    if (body.board) writeBoard(body.board);
+    writeState(ch, state);
+    if (body.board) writeBoard(ch, body.board);
 
-    return respond({ ok: true, state: state, updatedAt: readUpdatedAt() });
+    return respond({ ok: true, state: state, updatedAt: readUpdatedAt(ch) });
   } catch (err) {
     return respond({ ok: false, error: String(err) });
   } finally {
@@ -66,26 +75,26 @@ function sheetNamed(name) {
   return ss.getSheetByName(name) || ss.insertSheet(name);
 }
 
-function readState() {
-  var raw = sheetNamed(STATE_SHEET).getRange('A2').getValue();
+function readState(ch) {
+  var raw = sheetNamed(ch.stateSheet).getRange('A2').getValue();
   if (!raw) return {};
   try { return JSON.parse(raw); } catch (err) { return {}; }
 }
 
-function readUpdatedAt() {
-  return String(sheetNamed(STATE_SHEET).getRange('B2').getValue() || '');
+function readUpdatedAt(ch) {
+  return String(sheetNamed(ch.stateSheet).getRange('B2').getValue() || '');
 }
 
-function writeState(state) {
-  var sh = sheetNamed(STATE_SHEET);
+function writeState(ch, state) {
+  var sh = sheetNamed(ch.stateSheet);
   sh.getRange('A1:B1').setValues([['state (JSON — đừng sửa tay)', 'Cập nhật lúc']]);
   sh.getRange('A2').setValue(JSON.stringify(state));
   sh.getRange('B2').setValue(new Date().toISOString());
 }
 
-function writeBoard(rows) {
+function writeBoard(ch, rows) {
   if (!rows || !rows.length) return;
-  var sh = sheetNamed(BOARD_SHEET);
+  var sh = sheetNamed(ch.boardSheet);
   sh.clear();
 
   var cols = rows[0].length;
