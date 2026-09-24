@@ -60,6 +60,7 @@
     <span class="sync-chip" id="syncChip" hidden></span>
     <p class="hint" id="hint">Bấm <b>+ / −</b> để ghi ván · bấm <b>✓</b> để chọn người thắng</p>
     <button type="button" class="btn btn-lock" id="lockBtn" aria-haspopup="dialog" hidden>Chỉ xem</button>
+    <button type="button" class="btn btn-ghost" id="predictBtn" aria-haspopup="dialog">🍜 Dự đoán</button>
     <button type="button" class="btn btn-ghost" id="introReplayBtn">Giới thiệu</button>
     <button type="button" class="btn btn-ghost" id="resetAllBtn">Đặt lại giải</button>
   </div>
@@ -130,6 +131,22 @@
   </div>
 </div>
 
+<!-- Popup dự đoán vui — không cá cược bằng tiền, ai xem cũng đoán được -->
+<div class="modal" id="predictModal" role="dialog" aria-modal="true" aria-labelledby="predictModalTitle" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-card modal-card-predict" role="document">
+    <button type="button" class="modal-close" id="predictCloseBtn" aria-label="Đóng" data-close>✕</button>
+
+    <p class="modal-eyebrow">Dự đoán vui — không cá cược bằng tiền</p>
+    <h2 class="modal-holder" id="predictModalTitle">Lập kèo với bạn bè, ai thua đãi bữa trưa</h2>
+    <p class="pass-sub">Rủ một người khác cược ngược mình cho từng trận. Trận nào bắt đầu ghi điểm là tự khoá, không lập kèo mới được nữa.</p>
+
+    <div class="predict-list" id="predictList"></div>
+    <div id="predictSummary"></div>
+  </div>
+</div>
+<datalist id="predictNames"></datalist>
+
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script src="js/logo.js"></script>
@@ -138,5 +155,6 @@
 <script src="js/access.js"></script>
 <script src="js/intro.js"></script>
 <script src="js/app.js"></script>
+<script src="js/predict.js"></script>
 </body>
 </html>

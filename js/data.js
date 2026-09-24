@@ -72,6 +72,14 @@ const TOURNAMENT = {
     pollSeconds: 10
   },
 
+  /* Dự đoán vui — không cá cược bằng tiền: rủ một người khác lập "kèo" cho một
+     trận, mỗi người cược một bên thắng; ai đoán đúng thì người kia đãi bữa trưa.
+     Không cần mật khẩu, ai xem trang cũng lập kèo được. Dùng chung endpoint ở
+     TOURNAMENT.sync (đồng bộ qua kênh riêng trên cùng sheet). */
+  predict: {
+    prizeNote: 'Rủ nhau lập kèo mỗi trận — ai đoán sai thì đãi người kia một bữa trưa 🍜'
+  },
+
   payment: {
     bank: 'Techcombank',
     holder: 'NGUYEN HOANG ANH',

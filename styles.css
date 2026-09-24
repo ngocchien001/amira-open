@@ -1150,3 +1150,122 @@ body.is-locked .link-btn { cursor: pointer; }
 @media (max-width: 900px) {
   .btn-lock { font-size: 13px; padding: 8px 13px; }
 }
+
+/* ---------- Dự đoán vui (không cá cược bằng tiền) ---------- */
+
+.modal-card-predict {
+  width: min(480px, 100%);
+  text-align: left;
+}
+
+.predict-name-input {
+  font: inherit;
+  width: 100%;
+  margin-top: 14px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+}
+.predict-name-input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent-line);
+}
+
+.predict-list {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 46vh;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.predict-match {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  padding: 10px 12px;
+}
+
+.predict-match-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.predict-round {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.predict-locked {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: var(--accent-soft);
+  border-radius: 999px;
+  padding: 2px 9px;
+}
+
+.predict-empty { margin: 0; font-size: 13px; color: var(--ink-3); }
+
+.predict-bet-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.predict-bet-form .predict-name-input { margin-top: 0; flex: 1 1 0; min-width: 0; }
+.predict-vs { font-size: 11px; color: var(--ink-3); flex: none; }
+
+.predict-add-btn {
+  flex: none;
+  font-size: 12.5px;
+  padding: 9px 12px;
+  white-space: nowrap;
+}
+
+.predict-hint {
+  margin: 8px 0 0;
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.predict-bets {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 8px 0 0;
+  border-top: 1px dashed var(--accent-line);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.predict-bet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 10px;
+  font-size: 12.5px;
+}
+.predict-bet-line { color: var(--ink); }
+.predict-bet-result { color: var(--ink-3); white-space: nowrap; }
+.predict-bet-result.is-done { color: #157a3c; font-weight: 600; }
+
+.predict-summary {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--accent-line);
+}
+.predict-board-note { margin: 0; font-size: 12.5px; color: var(--ink-2); }
+.predict-summary-count { margin: 6px 0 0; font-size: 12.5px; font-weight: 600; color: var(--accent-ink); }
+
+@media (max-width: 480px) {
+  .predict-bet-form { flex-wrap: wrap; }
+  .predict-bet-form .predict-name-input { flex-basis: 100%; }
+}
