@@ -58,22 +58,22 @@ Lần đầu mở trang sẽ chạy một đoạn animation:
 
 ### Dự đoán vui (không cá cược bằng tiền)
 
-Nút **🍜 Dự đoán** trên thanh tiêu đề mở popup cho ai xem trang cũng đoán được —
-không cần mật khẩu, không dùng tiền, ai đoán đúng nhiều nhất thì được cả hội đãi
-một bữa trưa.
+Nút **🍜 Dự đoán** trên thanh tiêu đề mở popup để rủ nhau **lập kèo giữa đúng 2
+người** cho từng trận — không cần mật khẩu, không dùng tiền, ai đoán sai thì
+đãi người kia một bữa trưa. Không có bảng xếp hạng chung; mỗi kèo là một cặp
+độc lập, một người có thể lập bao nhiêu kèo cũng được với bất kỳ ai khác.
 
-- **Gõ tên rồi chọn người thắng** từng trận. Tên được nhớ trong trình duyệt cho
-  lần sau khỏi gõ lại.
-- **Đoán thêm tỉ số (tuỳ chọn)**: sau khi chọn người thắng, nhập tỉ số dự đoán —
-  đoán đúng cả tỉ số hiển thị (đã cộng chấp) thì được điểm thưởng.
-- **Tự khoá theo từng trận**: ngay khi một trận có điểm đầu tiên, dự đoán của
-  trận đó khoá lại — không ai đoán ăn theo kết quả đang diễn ra. Các trận khác
-  vẫn mở bình thường.
-- **Giấu lượt đoán của người khác cho tới khi khoá**: trước khi trận bắt đầu,
-  chỉ thấy số người đã đoán (không thấy đoán ai) để khỏi chọn theo số đông; sau
-  khi khoá thì công khai hết, kèm dấu đúng/sai khi trận đã có kết quả.
-- **Tính điểm**: đoán đúng người thắng +1 điểm, đoán đúng luôn tỉ số +1 điểm
-  nữa. Bảng xếp hạng cập nhật dần khi có kết quả từng trận.
+- **Lập kèo**: ở mỗi trận, gõ tên người cược bên này và tên người cược bên kia
+  rồi bấm `Lập kèo`. Hai tên có gợi ý tự động (tay cơ trong giải + tên đã gõ
+  trước đó) cho khỏi phải gõ lại.
+- **Tự khoá theo từng trận**: ngay khi một trận có điểm đầu tiên, không lập kèo
+  mới cho trận đó được nữa — không ai lập kèo ăn theo kết quả đang diễn ra.
+  Kèo đã lập từ trước vẫn giữ nguyên, chỉ không huỷ được nữa. Các trận khác vẫn
+  mở bình thường.
+- **Huỷ kèo** (lập nhầm tên): còn nút `Huỷ` cạnh mỗi kèo cho tới khi trận đó khoá.
+- **Tự giải quyết khi có kết quả**: trận xong là từng kèo tự báo ai thắng, ai
+  phải đãi bữa trưa — xem toàn bộ danh sách kèo (đang chờ / đã xong) ngay
+  trong popup, theo từng trận.
 - **Lưu trữ**: giống kết quả trận đấu — `localStorage` cục bộ, và đồng bộ qua
   Google Sheet nếu đã cấu hình `TOURNAMENT.sync.endpoint` (dùng chung endpoint,
   tách bảng riêng, xem mục Đồng bộ bên dưới — **⚠️ phải dán lại `Code.gs` và
@@ -195,7 +195,7 @@ js/access.js                khoá chỉnh sửa: hỏi mật khẩu trước khi
 apps-script/Code.gs         code dán vào Apps Script của sheet (kênh bracket + predict)
 js/intro.js                 màn giới thiệu: dựng nội dung, nút bỏ qua / tạm dừng
 js/app.js                   logic tính điểm, chấp ván, đi tiếp vòng trong, vẽ đường nối
-js/predict.js               dự đoán vui: ai thắng / tỉ số, khoá theo trận, bảng xếp hạng
+js/predict.js               dự đoán vui: lập kèo 2 người mỗi trận, khoá theo trận
 assets/intro-bg.jpg         ảnh nền của màn giới thiệu
 assets/og-image.jpg         ảnh hiện khi chia sẻ link (1200×630)
 assets/players/<id>.jpg     ảnh đại diện từng tay cơ, <id> là tên không dấu trong data.js

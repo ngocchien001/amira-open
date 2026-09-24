@@ -1,31 +1,32 @@
 /* ==========================================================================
    AMIRA OPEN — Dự đoán vui (không cá cược bằng tiền)
-   - Ai xem trang cũng đoán được: gõ tên, chọn người thắng, tuỳ chọn đoán tỉ số
-   - Một trận tự khoá dự đoán ngay khi trận đó có điểm đầu tiên (dựa vào
-     Bracket.isStarted() do js/app.js công khai) — công bằng, không ai đoán ăn
-     theo kết quả đang diễn ra
-   - Trước khi khoá, không lộ ai đoán gì (chỉ thấy số người đã đoán) để khỏi
-     copy theo số đông; sau khi khoá thì công khai hết
-   - Tính điểm: đúng người thắng +1, đoán đúng luôn tỉ số hiển thị +1 nữa.
-     Người nhiều điểm nhất được cả hội đãi 1 bữa trưa.
+   - Một "kèo" là lời cược giữa đúng 2 người cho MỘT trận cụ thể: người này
+     cược bên A thắng, người kia cược bên B thắng. Ai đúng thì thắng kèo,
+     người thua đãi người thắng một bữa trưa.
+   - Không có bảng xếp hạng chung — mỗi kèo độc lập, tự giải quyết khi trận có
+     kết quả. Một người có thể tham gia bao nhiêu kèo cũng được, với bất kỳ ai.
+   - Một trận tự khoá (không tạo kèo mới được nữa) ngay khi có điểm đầu tiên,
+     dựa vào Bracket.isStarted() do js/app.js công khai — công bằng, không ai
+     lập kèo ăn theo kết quả đang diễn ra. Kèo đã lập trước đó thì giữ nguyên,
+     chỉ không huỷ được nữa sau khi khoá.
    - Lưu localStorage + đồng bộ qua kênh riêng (channel "predict") trên cùng
      endpoint Apps Script với kết quả trận, xem js/store.js và apps-script/Code.gs.
    ========================================================================== */
 (function () {
   'use strict';
 
-  var NAME_KEY = 'amira-open:predict-name:v1';
   var channel = Store.channel('predict', 'amira-open:predict:v1', 'amira-open:predict-pending:v1');
 
-  /* rows[matchId + '::' + voterKey] = { matchId, voter, name, pick, scoreA, scoreB, ts } */
+  /* rows[betId] = { id, matchId, p1: { name, side }, p2: { name, side }, ts } */
   var rows = channel.loadLocal();
+
+  function validRow(r) {
+    return !!(r && r.matchId && r.p1 && r.p1.name && r.p2 && r.p2.name && r.p1.side && r.p2.side);
+  }
 
   function prune(src) {
     var out = {};
-    Object.keys(src).forEach(function (k) {
-      var r = src[k];
-      if (r && r.matchId && r.voter && r.pick) out[k] = r;
-    });
+    Object.keys(src).forEach(function (k) { if (validRow(src[k])) out[k] = src[k]; });
     return out;
   }
 
@@ -48,114 +49,67 @@
 
   window.addEventListener('amira:bracket-changed', render);
 
-  /* ---------- Người đoán ---------- */
-
-  function loadName() {
-    try { return localStorage.getItem(NAME_KEY) || ''; } catch (e) { return ''; }
-  }
-  function saveName(n) {
-    try { localStorage.setItem(NAME_KEY, n); } catch (e) { /* chế độ riêng tư */ }
-  }
-  function voterKeyOf(name) { return name.trim().toLowerCase(); }
-
-  /* ---------- Đọc kết quả trận từ Bracket (js/app.js công khai) ---------- */
-
-  function rowKey(matchId, voter) { return matchId + '::' + voter; }
-
   function rowsOfMatch(matchId) {
     return Object.keys(rows)
       .map(function (k) { return rows[k]; })
-      .filter(function (r) { return r.matchId === matchId; });
+      .filter(function (r) { return r.matchId === matchId; })
+      .sort(function (a, b) { return (a.ts || '').localeCompare(b.ts || ''); });
   }
 
-  function savePrediction(matchId, side) {
-    var name = String(nameInput.value || '').trim();
-    if (!name) {
-      toast('Nhập tên trước khi đặt cược nhé');
-      nameInput.focus();
-      return;
-    }
-    if (Bracket.isStarted(matchId)) return; // đã khoá, không cho sửa
-    saveName(name);
-    var voter = voterKeyOf(name);
-    var key = rowKey(matchId, voter);
-    var prev = rows[key];
+  function newBetId(matchId) {
+    return matchId + ':' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  /* ---------- Tạo / huỷ kèo ---------- */
+
+  function createBet(matchId, nameA, nameB, onDone) {
+    nameA = String(nameA || '').trim();
+    nameB = String(nameB || '').trim();
+    if (!nameA || !nameB) { toast('Nhập đủ tên hai người cược'); return; }
+    if (nameA.toLowerCase() === nameB.toLowerCase()) { toast('Hai người cược phải khác nhau'); return; }
+    if (Bracket.isStarted(matchId)) { toast('Trận đã bắt đầu, không lập kèo được nữa'); return; }
+
+    var id = newBetId(matchId);
     var row = {
+      id: id,
       matchId: matchId,
-      voter: voter,
-      name: name,
-      pick: side,
-      scoreA: prev ? prev.scoreA : null,
-      scoreB: prev ? prev.scoreB : null,
+      p1: { name: nameA, side: 'a' },
+      p2: { name: nameB, side: 'b' },
       ts: new Date().toISOString()
     };
-    rows[key] = row;
-    var set = {}; set[key] = row;
+    rows[id] = row;
+    var set = {}; set[id] = row;
     commit({ set: set, clear: [] });
+    if (onDone) onDone();
   }
 
-  function saveScoreGuess(matchId, side, value) {
-    var name = String(nameInput.value || '').trim();
-    if (!name || Bracket.isStarted(matchId)) return;
-    var voter = voterKeyOf(name);
-    var key = rowKey(matchId, voter);
-    var row = rows[key];
-    if (!row) return; // phải chọn người thắng trước
-    var n = value === '' ? null : Math.max(0, parseInt(value, 10) || 0);
-    row[side === 'a' ? 'scoreA' : 'scoreB'] = n;
-    row.ts = new Date().toISOString();
-    var set = {}; set[key] = row;
-    commit({ set: set, clear: [] });
-  }
-
-  /* ---------- Tính điểm ---------- */
-
-  function leaderboard() {
-    var byVoter = {}; // voter -> { name, points, correct, total }
-    TOURNAMENT.rounds.forEach(function (round) {
-      round.matches.forEach(function (m) {
-        var s = Bracket.state(m.id);
-        if (!s || !s.winner) return; // chỉ tính khi trận đã xong
-        var fmt = Bracket.formatOf(m, Bracket.playerAt(m, 'a'), Bracket.playerAt(m, 'b'));
-        rowsOfMatch(m.id).forEach(function (r) {
-          var p = byVoter[r.voter] || (byVoter[r.voter] = { name: r.name, points: 0, correct: 0, total: 0 });
-          p.name = r.name; // giữ cách viết tên gần nhất
-          p.total++;
-          if (r.pick !== s.winner) return;
-          p.correct++;
-          p.points += 1;
-          if (r.scoreA != null && r.scoreB != null && fmt) {
-            if (r.scoreA === Bracket.displayScore(m.id, 'a', fmt) &&
-                r.scoreB === Bracket.displayScore(m.id, 'b', fmt)) {
-              p.points += 1;
-            }
-          }
-        });
-      });
-    });
-    return Object.keys(byVoter).map(function (k) { return byVoter[k]; })
-      .sort(function (a, b) { return b.points - a.points || b.correct - a.correct || a.name.localeCompare(b.name); });
+  function cancelBet(id) {
+    var row = rows[id];
+    if (!row || Bracket.isStarted(row.matchId)) return; // đã khoá, không huỷ được nữa
+    delete rows[id];
+    commit({ set: {}, clear: [id] });
   }
 
   /* ---------- Bảng gửi lên sheet ---------- */
 
   function boardRows() {
-    var out = [['Trận', 'Vòng', 'Người đoán', 'Chọn thắng', 'Tỉ số đoán', 'Đúng?']];
+    var out = [['Trận', 'Vòng', 'Người cược A', 'Chọn', 'Người cược B', 'Chọn', 'Kết quả']];
     TOURNAMENT.rounds.forEach(function (round) {
       round.matches.forEach(function (m) {
         var s = Bracket.state(m.id);
         rowsOfMatch(m.id).forEach(function (r) {
-          var pickName = Bracket.playerAt(m, r.pick);
-          var guess = (r.scoreA != null && r.scoreB != null) ? (r.scoreA + '–' + r.scoreB) : '';
-          var correct = (s && s.winner) ? (r.pick === s.winner ? 'Đúng' : 'Sai') : '';
-          out.push([m.id, round.name, r.name, pickName ? pickName.name : r.pick, guess, correct]);
+          var p1Pick = Bracket.playerAt(m, r.p1.side);
+          var p2Pick = Bracket.playerAt(m, r.p2.side);
+          var result = '';
+          if (s && s.winner) {
+            var winnerName = r.p1.side === s.winner ? r.p1.name : r.p2.name;
+            var loserName = r.p1.side === s.winner ? r.p2.name : r.p1.name;
+            result = winnerName + ' thắng · ' + loserName + ' đãi bữa trưa';
+          }
+          out.push([m.id, round.name, r.p1.name, p1Pick ? p1Pick.name : '', r.p2.name, p2Pick ? p2Pick.name : '', result]);
         });
       });
     });
-    var lb = leaderboard();
-    out.push(['', '', '', '', '', '']);
-    out.push(['BXH', 'Tên', 'Điểm', 'Đoán đúng', 'Tổng lượt đoán', '']);
-    lb.forEach(function (p) { out.push(['', p.name, p.points, p.correct, p.total, '']); });
     return out;
   }
 
@@ -163,8 +117,8 @@
 
   var modal = document.getElementById('predictModal');
   var listEl = document.getElementById('predictList');
-  var boardEl = document.getElementById('predictBoard');
-  var nameInput = document.getElementById('predictName');
+  var summaryEl = document.getElementById('predictSummary');
+  var nameListEl = document.getElementById('predictNames');
   var openBtn = document.getElementById('predictBtn');
   var toastEl = document.getElementById('toast');
   var toastTimer;
@@ -184,19 +138,96 @@
     return n;
   }
 
+  /* Gợi ý tên: tay cơ trong giải + những tên đã từng gõ để lập kèo */
+  function updateNameList() {
+    if (!nameListEl) return;
+    var names = {};
+    PLAYERS.forEach(function (p) { names[p.name] = true; });
+    Object.keys(rows).forEach(function (k) {
+      var r = rows[k];
+      if (r.p1) names[r.p1.name] = true;
+      if (r.p2) names[r.p2.name] = true;
+    });
+    nameListEl.innerHTML = '';
+    Object.keys(names).sort().forEach(function (n) {
+      var opt = document.createElement('option');
+      opt.value = n;
+      nameListEl.appendChild(opt);
+    });
+  }
+
+  function buildBetForm(match, a, b) {
+    var form = el('div', 'predict-bet-form');
+    var inputA = document.createElement('input');
+    inputA.type = 'text';
+    inputA.className = 'predict-name-input';
+    inputA.placeholder = 'Ai cược ' + a.name + ' thắng';
+    inputA.setAttribute('list', 'predictNames');
+    inputA.setAttribute('autocomplete', 'off');
+
+    var inputB = document.createElement('input');
+    inputB.type = 'text';
+    inputB.className = 'predict-name-input';
+    inputB.placeholder = 'Ai cược ' + b.name + ' thắng';
+    inputB.setAttribute('list', 'predictNames');
+    inputB.setAttribute('autocomplete', 'off');
+
+    var addBtn = el('button', 'btn btn-ghost predict-add-btn', 'Lập kèo 🤝');
+    addBtn.type = 'button';
+    addBtn.addEventListener('click', function () {
+      createBet(match.id, inputA.value, inputB.value, function () {
+        inputA.value = '';
+        inputB.value = '';
+        inputA.focus();
+      });
+    });
+
+    form.appendChild(inputA);
+    form.appendChild(el('span', 'predict-vs', 'vs'));
+    form.appendChild(inputB);
+    form.appendChild(addBtn);
+    return form;
+  }
+
+  function buildBetList(match, bets, s, finished) {
+    var ul = el('ul', 'predict-bets');
+    bets.forEach(function (bet) {
+      var li = el('li', 'predict-bet');
+      var p1Pick = Bracket.playerAt(match, bet.p1.side);
+      var p2Pick = Bracket.playerAt(match, bet.p2.side);
+      li.appendChild(el('span', 'predict-bet-line',
+        bet.p1.name + ' (cược ' + (p1Pick ? p1Pick.name : '?') + ')' +
+        ' — ' + bet.p2.name + ' (cược ' + (p2Pick ? p2Pick.name : '?') + ')'));
+
+      if (finished) {
+        var winnerName = bet.p1.side === s.winner ? bet.p1.name : bet.p2.name;
+        var loserName = bet.p1.side === s.winner ? bet.p2.name : bet.p1.name;
+        li.appendChild(el('span', 'predict-bet-result is-done', '🏆 ' + winnerName + ' thắng · ' + loserName + ' đãi bữa trưa'));
+      } else if (Bracket.isStarted(match.id)) {
+        li.appendChild(el('span', 'predict-bet-result', 'Đang chờ kết quả'));
+      } else {
+        var cancel = el('button', 'link-btn', 'Huỷ');
+        cancel.type = 'button';
+        cancel.addEventListener('click', function () { cancelBet(bet.id); });
+        li.appendChild(cancel);
+      }
+      ul.appendChild(li);
+    });
+    return ul;
+  }
+
   function buildMatchCard(match, roundName) {
     var a = Bracket.playerAt(match, 'a');
     var b = Bracket.playerAt(match, 'b');
     var started = Bracket.isStarted(match.id);
-    var finished = !!(Bracket.state(match.id) && Bracket.state(match.id).winner);
-    var name = String(nameInput.value || '').trim();
-    var mine = name ? rows[rowKey(match.id, voterKeyOf(name))] : null;
+    var s = Bracket.state(match.id);
+    var finished = !!(s && s.winner);
 
     var card = el('div', 'predict-match');
     card.dataset.match = match.id;
 
     var head = el('div', 'predict-match-head');
-    head.appendChild(el('span', 'predict-round', roundName));
+    head.appendChild(el('span', 'predict-round', roundName + (a && b ? ' · ' + a.name + ' vs ' + b.name : '')));
     if (started) head.appendChild(el('span', 'predict-locked', finished ? 'Đã xong' : 'Đã khoá'));
     card.appendChild(head);
 
@@ -205,117 +236,44 @@
       return card;
     }
 
-    var pickWrap = el('div', 'predict-pick');
-    ['a', 'b'].forEach(function (side) {
-      var p = side === 'a' ? a : b;
-      var btn = el('button', 'predict-pick-btn', p.name);
-      btn.type = 'button';
-      var picked = mine && mine.pick === side;
-      var actual = Bracket.state(match.id) && Bracket.state(match.id).winner;
-      if (picked) btn.classList.add('is-picked');
-      if (finished) {
-        if (actual === side) btn.classList.add('is-actual-winner');
-        if (picked && actual !== side) btn.classList.add('is-wrong');
-      }
-      if (started) {
-        btn.disabled = true;
-      } else {
-        btn.addEventListener('click', function () { savePrediction(match.id, side); });
-      }
-      pickWrap.appendChild(btn);
-      if (side === 'a') pickWrap.appendChild(el('span', 'predict-vs', 'vs'));
-    });
-    card.appendChild(pickWrap);
+    if (!started) card.appendChild(buildBetForm(match, a, b));
 
-    var scoreWrap = el('div', 'predict-score');
-    ['a', 'b'].forEach(function (side) {
-      var input = document.createElement('input');
-      input.type = 'number';
-      input.min = '0';
-      input.inputMode = 'numeric';
-      input.className = 'predict-score-input';
-      input.placeholder = '?';
-      input.disabled = started || !mine;
-      input.value = mine && mine[side === 'a' ? 'scoreA' : 'scoreB'] != null
-        ? mine[side === 'a' ? 'scoreA' : 'scoreB'] : '';
-      input.addEventListener('change', function () { saveScoreGuess(match.id, side, input.value); });
-      scoreWrap.appendChild(input);
-      if (side === 'a') scoreWrap.appendChild(el('span', 'predict-score-sep', '–'));
-    });
-    card.appendChild(scoreWrap);
-    if (!mine && !started) {
-      card.appendChild(el('p', 'predict-hint', 'Chọn người thắng trước rồi mới đoán được tỉ số'));
-    }
-
-    var picksHere = rowsOfMatch(match.id);
-    if (!started) {
-      if (picksHere.length) {
-        card.appendChild(el('p', 'predict-count', picksHere.length + ' người đã đoán · ẩn cho tới khi khoá'));
-      }
-    } else if (picksHere.length) {
-      var ul = el('ul', 'predict-others');
-      picksHere.forEach(function (r) {
-        var p = Bracket.playerAt(match, r.pick);
-        var line = r.name + ': ' + (p ? p.name : r.pick);
-        if (r.scoreA != null && r.scoreB != null) line += ' · ' + r.scoreA + '–' + r.scoreB;
-        var li = el('li', null, line);
-        if (finished) {
-          var actualWinner = Bracket.state(match.id).winner;
-          li.className = r.pick === actualWinner ? 'is-correct' : 'is-wrong';
-        }
-        ul.appendChild(li);
-      });
-      card.appendChild(ul);
+    var bets = rowsOfMatch(match.id);
+    if (bets.length) {
+      card.appendChild(buildBetList(match, bets, s, finished));
+    } else if (!started) {
+      card.appendChild(el('p', 'predict-hint', 'Chưa có kèo nào cho trận này'));
     }
 
     return card;
   }
 
-  function buildLeaderboard() {
-    var lb = leaderboard();
-    var box = el('div', 'predict-board');
-    box.appendChild(el('h3', 'predict-board-title', '🍜 Bảng xếp hạng dự đoán'));
+  function buildSummary() {
+    var all = Object.keys(rows).map(function (k) { return rows[k]; });
+    var done = all.filter(function (r) {
+      var s = Bracket.state(r.matchId);
+      return s && s.winner;
+    }).length;
+
+    var box = el('div', 'predict-summary');
     box.appendChild(el('p', 'predict-board-note', (TOURNAMENT.predict && TOURNAMENT.predict.prizeNote) || ''));
-    if (!lb.length) {
-      box.appendChild(el('p', 'predict-empty', 'Chưa có trận nào xong để tính điểm.'));
-      return box;
+    if (all.length) {
+      box.appendChild(el('p', 'predict-summary-count', all.length + ' kèo đã lập · ' + done + ' kèo đã có kết quả'));
     }
-    var table = el('table', 'predict-table');
-    var thead = el('thead');
-    var hr = el('tr');
-    ['#', 'Tên', 'Điểm', 'Đúng/Tổng'].forEach(function (t) { hr.appendChild(el('th', null, t)); });
-    thead.appendChild(hr);
-    table.appendChild(thead);
-    var tbody = el('tbody');
-    lb.forEach(function (p, i) {
-      var tr = el('tr');
-      if (i === 0 && p.points > 0) tr.className = 'is-leader';
-      tr.appendChild(el('td', null, String(i + 1)));
-      tr.appendChild(el('td', null, p.name + (i === 0 && p.points > 0 ? ' 🍜' : '')));
-      tr.appendChild(el('td', null, String(p.points)));
-      tr.appendChild(el('td', null, p.correct + '/' + p.total));
-      tbody.appendChild(tr);
-    });
-    table.appendChild(tbody);
-    box.appendChild(table);
     return box;
   }
 
   function render() {
     if (!listEl) return;
+    updateNameList();
     listEl.innerHTML = '';
     TOURNAMENT.rounds.forEach(function (round) {
-      round.matches.forEach(function (m) {
-        listEl.appendChild(buildMatchCard(m, round.name));
-      });
+      round.matches.forEach(function (m) { listEl.appendChild(buildMatchCard(m, round.name)); });
     });
-    boardEl.innerHTML = '';
-    boardEl.appendChild(buildLeaderboard());
-  }
-
-  if (nameInput) {
-    nameInput.value = loadName();
-    nameInput.addEventListener('input', render);
+    if (summaryEl) {
+      summaryEl.innerHTML = '';
+      summaryEl.appendChild(buildSummary());
+    }
   }
 
   if (openBtn && modal) {

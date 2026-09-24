@@ -138,16 +138,14 @@
     <button type="button" class="modal-close" id="predictCloseBtn" aria-label="Đóng" data-close>✕</button>
 
     <p class="modal-eyebrow">Dự đoán vui — không cá cược bằng tiền</p>
-    <h2 class="modal-holder" id="predictModalTitle">Ai thắng, tỉ số bao nhiêu?</h2>
-    <p class="pass-sub">Gõ tên rồi chọn người thắng từng trận. Trận nào bắt đầu ghi điểm là tự khoá dự đoán của trận đó.</p>
-
-    <input type="text" class="predict-name-input" id="predictName"
-           placeholder="Tên của bạn" autocomplete="name" maxlength="40">
+    <h2 class="modal-holder" id="predictModalTitle">Lập kèo với bạn bè, ai thua đãi bữa trưa</h2>
+    <p class="pass-sub">Rủ một người khác cược ngược mình cho từng trận. Trận nào bắt đầu ghi điểm là tự khoá, không lập kèo mới được nữa.</p>
 
     <div class="predict-list" id="predictList"></div>
-    <div id="predictBoard"></div>
+    <div id="predictSummary"></div>
   </div>
 </div>
+<datalist id="predictNames"></datalist>
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
