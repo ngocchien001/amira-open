@@ -34,7 +34,7 @@ const FORMAT_RULE = {
 const TOURNAMENT = {
   name: 'AMIRA OPEN',
   subtitle: 'Giải billiards 9 bi · thể thức xếp cao',
-  fee: 50000,
+  fee: 100000,
   feeNote: 'Người thua trả tiền bàn',
 
   /* Thông tin hiển thị trong màn giới thiệu đầu trang */
@@ -45,8 +45,9 @@ const TOURNAMENT = {
     address: '39 Lê Văn Lương'
   },
   prizes: [
-    { icon: '🏆', rank: 'Giải nhất', value: '200.000đ', extra: '+ Cúp vô địch' },
-    { icon: '🥈', rank: 'Giải nhì',  value: '100.000đ' }
+    { icon: '🏆', rank: 'Giải nhất', value: '300.000đ', extra: '+ Cúp vô địch' },
+    { icon: '🥈', rank: 'Giải nhì',  value: '150.000đ' },
+    { icon: '🥉', rank: 'Giải ba',   value: '100.000đ' }
   ],
   intro: {
     /* false: chạy mỗi lần tải trang (hợp khi chiếu trang này lên màn hình ở quán).
