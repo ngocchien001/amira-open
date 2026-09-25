@@ -45,9 +45,8 @@ const TOURNAMENT = {
     address: '39 Lê Văn Lương'
   },
   prizes: [
-    { icon: '🏆', rank: 'Giải nhất', value: '300.000đ', extra: '+ Cúp vô địch' },
-    { icon: '🥈', rank: 'Giải nhì',  value: '150.000đ' },
-    { icon: '🥉', rank: 'Giải ba',   value: '100.000đ' }
+    { icon: '🏆', rank: 'Giải nhất', value: '450.000đ', extra: '+ Cúp vô địch' },
+    { icon: '🥈', rank: 'Giải nhì',  value: '150.000đ' }
   ],
   intro: {
     /* false: chạy mỗi lần tải trang (hợp khi chiếu trang này lên màn hình ở quán).
