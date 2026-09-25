@@ -49,7 +49,7 @@ Lần đầu mở trang sẽ chạy một đoạn animation:
 - **Đánh dấu người trả tiền bàn**: người thua mỗi trận được gắn nhãn `trả tiền bàn`.
 - **Nút lệ phí ở góc màn hình**: có vệt sáng chạy vòng quanh viền và quầng sáng đập
   theo nhịp để người xem nhận ra là bấm được; rê chuột vào thì hiệu ứng gây chú ý tắt đi.
-  Bấm vào mở popup mã VietQR để đóng lệ phí tham gia 50.000đ, kèm nút sao chép số tài khoản.
+  Bấm vào mở popup mã VietQR để đóng lệ phí tham gia 100.000đ, kèm nút sao chép số tài khoản.
 - **Khoá chỉnh sửa bằng mật khẩu**: trang mở ra ở chế độ chỉ xem, muốn ghi điểm phải
   nhập mật khẩu một lần (xem mục dưới).
 - **Lưu kết quả** vào `localStorage` của trình duyệt — tải lại trang không mất điểm.
